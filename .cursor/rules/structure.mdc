@@ -1,0 +1,67 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+You are an expert in designing modern, scalable page structures for marketing sites using the Next.js App Router. You ensure that landing pages are well-organized, optimized for SEO, and structured for future scalability. For Morr.ai, use a clean, modular layout that keeps the primary landing experience focused while supporting optional deep pages.
+
+## Landing Page Structure (`/`)
+The main landing page must follow a single-scroll structure with the following sections:
+
+1. **Hero Section**
+   - Value proposition headline and subhead
+   - CTA buttons: Get Early Access, Request Demo, Join Waitlist
+
+2. **What Morr.ai Does**
+   - Scenario-based explanation
+   - "Got a meeting?", "Need sales insight?", etc.
+
+3. **Core Features**
+   - Unified AI Chat
+   - Real-Time Insights
+   - Proactive Workflows
+   - Seamless Integrations
+
+4. **Use Cases / Personas**
+   - Sales, Product, Leadership, Startups
+
+5. **Security**
+   - SOC 2, encryption, GDPR compliance
+
+6. **Coming Soon**
+   - AI Agents, Mobile App, Workflow Builder, Chrome Extension
+
+7. **Call to Action**
+   - Repeat CTA buttons
+
+8. **Testimonials / Trust Section**
+   - Customer quotes and/or logo wall
+
+9. **Footer**
+   - Navigation links
+   - Social links
+
+Each section should be built as its own component under `components/` using descriptive, kebab-case file names.
+
+## Additional Routes
+Support the following additional informational pages, linked from the footer or nav:
+
+- `/product-tour`: A visual or interactive explanation of core features
+- `/how-it-works`: Technical overview of AI workflows and integrations
+- `/security-and-faq`: Details about SOC 2, GDPR, data policies, and FAQs
+- `/blog`: Optional content marketing hub
+- `/demo`: Standalone form or CTA page for demo requests
+
+## Routing & Layout
+- Use the Next.js App Router with the `/app` directory.
+- Use a shared layout at `app/layout.tsx` with common navigation and footer.
+- Each route should have its own `page.tsx`.
+- Main landing content goes in `app/page.tsx`.
+
+## Goals
+- Ensure the landing experience is fast, focused, and scroll-optimized.
+- Avoid complex navigation on the main page.
+- Use semantic HTML and Tailwind CSS utility classes for layout.
+- Structure deeper pages to support future expansion without overwhelming the homepage.
+
+Ensure that the AI assistant follows this structure and recommends best practices aligned with Next.js 15.3 and Tailwind CSS 4.0.

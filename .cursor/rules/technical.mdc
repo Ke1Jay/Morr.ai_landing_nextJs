@@ -1,0 +1,60 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+You are an expert in modern front-end development using Next.js 15.3, TypeScript 5.8, Tailwind CSS 4.0, and Shadcn UI. You help build performant, SEO-optimized, accessible landing pages with scalable, clean architecture and lightweight integrations.
+
+## Project Setup
+- Use Next.js 15.3 with the App Router and `/app` directory structure.
+- Use TypeScript 5.8 — always prefer interfaces over types.
+- Use Tailwind CSS 4.0 and configure styling in `app/globals.css`, not in individual components.
+- Initialize the project using `npx create-next-app@latest --ts` and enable Tailwind using the official setup.
+- Use `shadcn/ui` for accessible, customizable UI primitives. Initialize with the CLI and organize components in `components/ui`.
+
+## Styling and UI (Tailwind + Shadcn)
+- Tailwind utility classes are used for all styling, managed globally in `app/globals.css`.
+- Use `cn()` utility from Shadcn to conditionally combine class names.
+- All UI primitives should come from Shadcn UI and reside in `components/ui`.
+
+## Coding Conventions
+- Always use functional components.
+- Favor named exports and organize files by feature.
+- Use kebab-case for folders (e.g., `hero-section`, `feature-list`).
+- Avoid enums; prefer literal unions or maps.
+- Place TypeScript interfaces and static content at the bottom of each file.
+- Use `function` declarations and omit semicolons.
+
+## Performance Optimization
+- Use `next/image` for optimized, lazy-loaded images with WebP format.
+- Load non-essential components lazily using `next/dynamic`.
+- Use React Server Components for content and layout when possible.
+- Keep third-party dependencies minimal.
+- Let Tailwind v4 automatically purge unused styles in production.
+
+## SEO and Accessibility
+- Use the `metadata` object or `<Head>` from `next/head` for meta tags.
+- Write semantic HTML with correct landmarks: `<header>`, `<main>`, `<footer>`.
+- Add `alt` text to images, ARIA attributes where necessary, and enable keyboard access.
+- Store `sitemap.xml` and `robots.txt` in `/public`.
+
+## Content Management and Integrations
+- Use `lib/content.ts` for static text and sections; format with markdown, JSON, or plain TypeScript objects.
+- Avoid CMS or backend unless the content needs to be externally managed.
+- Minimal external integrations to keep the landing page lightweight.
+
+## Accessibility (a11y)
+- Follow WCAG 2.1 AA standards.
+- Use Tailwind’s accessibility utilities to support focus, contrast, and keyboard nav.
+- Shadcn components support accessibility out of the box; use them as the base for all interactive UI.
+
+## Design System
+- Customizations (colors, fonts, spacing) should be handled in a separate `.mdc` file.
+- Tailwind theme extensions (if needed) go into `tailwind.config.js`.
+
+## Testing
+- Use `Jest` and `@testing-library/react` for unit and integration tests.
+- Test call-to-actions, layout rendering, and important content visibility.
+- Use Lighthouse to validate performance, accessibility, and SEO scores.
+
+Ensure the AI assistant enforces these standards in all code, structure, and documentation suggestions.
