@@ -12,10 +12,6 @@ export const metadata: Metadata = {
   description: "Morr.ai connects your tools, learns your workflow, and proactively delivers insights and automates tasks.",
 };
 
-interface RootLayoutProps {
-  children: React.ReactNode;
-}
-
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -31,4 +27,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
       </body>
     </html>
   );
+}
+
+interface RootLayoutProps {
+  children: React.ReactNode;
 }
