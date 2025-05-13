@@ -12,7 +12,8 @@ import {
   NavigationMenuTrigger,
 } from "@/components/ui/navigation-menu"
 
-// Placeholder Logo
+// Displays the Morr.ai logo as an SVG.
+// React.memo is used for performance optimization, preventing re-renders if props don't change.
 const Logo = React.memo(() => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
@@ -25,9 +26,11 @@ const Logo = React.memo(() => (
     <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5-10-5-10 5z" />
   </svg>
 ))
-Logo.displayName = "Logo"
+Logo.displayName = "Logo" // Useful for debugging in React DevTools.
 
-// Reusable ListItem component for navigation menu items
+// A reusable component for displaying individual items within the navigation dropdowns.
+// It handles styling for hover/focus states and layouts the title and description.
+// React.memo and React.forwardRef are used for performance and to correctly pass down refs.
 const ListItem = React.memo(React.forwardRef<
   React.ElementRef<"a">,
   React.ComponentPropsWithoutRef<"a">
@@ -38,7 +41,7 @@ const ListItem = React.memo(React.forwardRef<
         <a
           ref={ref}
           className={cn(
-            "block select-none rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
+            "block select-none rounded-xl p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground",
             className
           )}
           {...props}
@@ -54,7 +57,8 @@ const ListItem = React.memo(React.forwardRef<
 }))
 ListItem.displayName = "ListItem"
 
-// Additional Content Component
+// Component to render the list of links in the 'additional content' section of a dropdown.
+// This section typically appears on the right side of the main sub-items.
 const AdditionalContentList = React.memo(({ content }: { content: AdditionalContent }) => (
   <div className="p-4">
     <h4 className="mb-2 text-sm font-medium leading-none">{content.title}</h4>
@@ -74,22 +78,26 @@ const AdditionalContentList = React.memo(({ content }: { content: AdditionalCont
 ))
 AdditionalContentList.displayName = "AdditionalContentList"
 
-// Navigation Item Component
+// Dynamically renders a navigation menu item.
+// It can either be a direct link or a trigger for a dropdown menu with sub-items
+// and an optional additional content section.
 const NavigationItemComponent = React.memo(({ item }: { item: NavigationItemConfig }) => {
   if (item.subItems) {
+    // Renders a dropdown menu if subItems are present.
     return (
       <NavigationMenuItem>
         <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
         <NavigationMenuContent>
           <div className={cn(
             "flex",
+            // Dynamically adjusts width based on the presence of additional content.
             item.additionalContent ? "w-[40rem]" : "w-[20rem]",
-            "max-w-[90vw]"
+            "max-w-[90vw]" // Ensures responsiveness on smaller screens.
           )}>
             <ul className="flex-1 p-4 space-y-3 min-w-[20rem]">
               {item.subItems.map((subItem) => (
                 <ListItem 
-                  key={subItem.href}
+                  key={subItem.href} // React key for list items.
                   href={subItem.href}
                   title={subItem.title}
                 >
@@ -97,8 +105,9 @@ const NavigationItemComponent = React.memo(({ item }: { item: NavigationItemConf
                 </ListItem>
               ))}
             </ul>
+            {/* Renders the additional content section if defined for the item. */}
             {item.additionalContent && (
-              <div className="w-[15rem] border-l">
+              <div className="w-[15rem] bg-muted border border-border rounded-xl">
                 <AdditionalContentList content={item.additionalContent} />
               </div>
             )}
@@ -108,6 +117,7 @@ const NavigationItemComponent = React.memo(({ item }: { item: NavigationItemConf
     )
   }
 
+  // Renders a simple link if no subItems are present.
   return (
     <NavigationMenuItem>
       <Link href={item.href!} legacyBehavior passHref>
@@ -120,12 +130,15 @@ const NavigationItemComponent = React.memo(({ item }: { item: NavigationItemConf
 })
 NavigationItemComponent.displayName = "NavigationItemComponent"
 
+// The main header component for the website.
+// It includes the logo, main navigation menu, and action buttons like 'Sign In' and 'Request Demo'.
+// It is designed to be sticky at the top of the page.
 export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
+          {/* Logo and site title link to homepage */}
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <Logo />
@@ -133,16 +146,17 @@ export function Header() {
             </Link>
           </div>
 
-          {/* Navigation Menu */}
+          {/* Desktop navigation menu, hidden on smaller screens */}
           <NavigationMenu className="hidden md:flex">
             <NavigationMenuList className="flex space-x-2">
+              {/* Maps over the navigationItems configuration to render each menu item */}
               {navigationItems.map((item) => (
                 <NavigationItemComponent key={item.title} item={item} />
               ))}
             </NavigationMenuList>
           </NavigationMenu>
 
-          {/* Right Aligned Buttons */}
+          {/* Call-to-action buttons aligned to the right */}
           <div className="flex items-center space-x-4">
             <Button variant="outline" asChild>
               <Link href="/login">Sign In</Link>
@@ -157,30 +171,39 @@ export function Header() {
   )
 }
 
-// Navigation configuration
+// TYPE DEFINITIONS AND CONFIGURATION
+// These are placed at the bottom as per coding conventions.
+
+// Defines the structure for individual sub-items within a navigation dropdown.
 interface SubItem {
   title: string
   href: string
   description: string
 }
 
+// Defines the structure for a single link item in the 'additional content' section.
 interface AdditionalContentItem {
   title: string
   href: string
 }
 
+// Defines the structure for the 'additional content' block in a navigation dropdown.
 interface AdditionalContent {
-  title: string
-  items: AdditionalContentItem[]
+  title: string            // Title for the additional content section (e.g., "By Team").
+  items: AdditionalContentItem[] // Array of links within this section.
 }
 
+// Defines the overall structure for a main navigation item.
+// It can be a simple link (href) or a dropdown with subItems and optional additionalContent.
 interface NavigationItemConfig {
   title: string
-  href?: string
-  subItems?: SubItem[]
-  additionalContent?: AdditionalContent
+  href?: string                 // Optional direct link for top-level items without dropdowns.
+  subItems?: SubItem[]          // Optional array of sub-items for a dropdown.
+  additionalContent?: AdditionalContent // Optional additional content for the dropdown's right side.
 }
 
+// Central configuration for the entire navigation menu.
+// Defines the structure and content of all main navigation links and their dropdowns.
 const navigationItems: NavigationItemConfig[] = [
   {
     title: "Product",
