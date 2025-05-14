@@ -33,8 +33,8 @@ Logo.displayName = "Logo" // Useful for debugging in React DevTools.
 // React.memo and React.forwardRef are used for performance and to correctly pass down refs.
 const ListItem = React.memo(React.forwardRef<
   React.ElementRef<"a">,
-  React.ComponentPropsWithoutRef<"a">
->(({ className, title, children, ...props }, ref) => {
+  React.ComponentPropsWithoutRef<"a"> & { icon?: React.ReactNode }
+>(({ className, title, children, icon, ...props }, ref) => {
   return (
     <li>
       <NavigationMenuLink asChild>
@@ -46,7 +46,10 @@ const ListItem = React.memo(React.forwardRef<
           )}
           {...props}
         >
-          <div className="text-sm font-medium leading-none mb-2">{title}</div>
+          <div className="flex items-center mb-2">
+            {icon && <span className="mr-2">{icon}</span>}
+            <div className="text-lg font-medium leading-none">{title}</div>
+          </div>
           <p className="text-sm leading-snug text-muted-foreground max-w-[16rem] break-words">
             {children}
           </p>
@@ -100,6 +103,7 @@ const NavigationItemComponent = React.memo(({ item }: { item: NavigationItemConf
                   key={subItem.href} // React key for list items.
                   href={subItem.href}
                   title={subItem.title}
+                  icon={subItem.icon}
                 >
                   {subItem.description}
                 </ListItem>
@@ -120,10 +124,11 @@ const NavigationItemComponent = React.memo(({ item }: { item: NavigationItemConf
   // Renders a simple link if no subItems are present.
   return (
     <NavigationMenuItem>
-      <Link href={item.href!} legacyBehavior passHref>
-        <NavigationMenuLink className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50">
-          {item.title}
-        </NavigationMenuLink>
+      <Link 
+        href={item.href!}
+        className="group inline-flex h-10 w-max items-center justify-center rounded-md bg-background px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50"
+      >
+        {item.title}
       </Link>
     </NavigationMenuItem>
   )
@@ -179,6 +184,7 @@ interface SubItem {
   title: string
   href: string
   description: string
+  icon?: React.ReactNode
 }
 
 // Defines the structure for a single link item in the 'additional content' section.
@@ -211,17 +217,20 @@ const navigationItems: NavigationItemConfig[] = [
       {
         title: "Core Features",
         href: "/features",
-        description: "Discover proactive AI, unified search, and real-time insights."
+        description: "Discover proactive AI, unified search, and real-time insights.",
+        icon: <span>🚀</span>
       },
       {
         title: "Integrations",
         href: "/integrations",
-        description: "Connect seamlessly with Slack, Google Drive, Salesforce, and more."
+        description: "Connect seamlessly with Slack, Google Drive, Salesforce, and more.",
+        icon: <span>🔗</span>
       },
       {
         title: "Security & Trust",
         href: "/security",
-        description: "Learn about our SOC 2-ready, GDPR-compliant infrastructure."
+        description: "Learn about our SOC 2-ready, GDPR-compliant infrastructure.",
+        icon: <span>🔒</span>
       }
     ],
     additionalContent: {
@@ -239,22 +248,26 @@ const navigationItems: NavigationItemConfig[] = [
       {
         title: "Proactive Meeting Briefs",
         href: "/use-cases/meeting-briefs",
-        description: "Arrive prepared with AI-generated summaries and key documents."
+        description: "Arrive prepared with AI-generated summaries and key documents.",
+        icon: <span>📅</span>
       },
       {
         title: "Real-Time Sales Insights",
         href: "/use-cases/sales-insights",
-        description: "Access live pipeline data, trends, and next-step recommendations."
+        description: "Access live pipeline data, trends, and next-step recommendations.",
+        icon: <span>💼</span>
       },
       {
         title: "Unified Knowledge Access",
         href: "/use-cases/unified-search",
-        description: "Ask any question and get instant answers from all your connected tools."
+        description: "Ask any question and get instant answers from all your connected tools.",
+        icon: <span>🔍</span>
       },
       {
         title: "Automated Team Updates",
         href: "/use-cases/team-updates",
-        description: "Keep everyone in sync with proactive status reports and summaries."
+        description: "Keep everyone in sync with proactive status reports and summaries.",
+        icon: <span>👥</span>
       }
     ],
     additionalContent: {
@@ -273,17 +286,20 @@ const navigationItems: NavigationItemConfig[] = [
       {
         title: "About Us",
         href: "/about",
-        description: "Our story and mission"
+        description: "Our story and mission",
+        icon: <span>🤝</span>
       },
       {
         title: "Careers",
         href: "/careers",
-        description: "Join our growing team"
+        description: "Join our growing team",
+        icon: <span>🌱</span>
       },
       {
         title: "Blog",
         href: "/blog",
-        description: "Latest news and insights"
+        description: "Latest news and insights",
+        icon: <span>📰</span>
       }
     ],
     additionalContent: {
