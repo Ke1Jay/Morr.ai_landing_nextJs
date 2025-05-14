@@ -10,12 +10,12 @@ export function CtaSection() {
             ✅ Ready to Experience Morr.ai?
           </h2>
           <p className="mx-auto max-w-[600px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-           👇 Join early access and discover the first AI designed to truly anticipate your needs.
+            👇 Join early access and discover the first AI designed to truly anticipate your needs.
           </p>
         </div>
         <div className="mx-auto w-full max-w-sm space-y-2">
           <div className="flex flex-col sm:flex-row justify-center gap-2 pt-4">
-             {/* Reusing CTAs from Hero/structure.mdc */}
+            {/* Reusing CTAs from Hero/structure.mdc */}
             <Button size="lg" className="w-full sm:w-auto">Get Early Access</Button>
             <Button variant="outline" size="lg" className="w-full sm:w-auto">Request Demo</Button>
             <Button variant="secondary" size="lg" className="w-full sm:w-auto">Join Waitlist</Button>

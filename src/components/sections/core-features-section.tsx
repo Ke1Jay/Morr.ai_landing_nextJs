@@ -46,7 +46,7 @@ export function CoreFeaturesSection() {
 
           {/* Feature 2: Real-Time Insights */}
           <div className="grid gap-2 p-6 rounded-lg border bg-card text-card-foreground shadow-sm">
-             <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <PlaceholderIcon className="h-6 w-6 text-primary" />
               <h3 className="text-xl font-bold">📊 Real-Time Insights, Delivered Proactively</h3>
             </div>

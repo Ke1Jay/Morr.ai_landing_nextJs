@@ -2,7 +2,7 @@ import React from 'react'
 
 export function WhatItDoesSection() {
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
+    <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
       <div className="container px-4 md:px-6">
         <div className="flex flex-col items-center justify-center space-y-4 text-center">
           <div className="space-y-2">
@@ -33,7 +33,7 @@ export function WhatItDoesSection() {
           <div className="grid gap-1 text-center md:text-left">
             <h3 className="text-lg font-bold">🧩 Feeling overwhelmed by tool chaos?</h3>
             <p className="text-sm text-muted-foreground">
-               Morr.ai centralizes data from your apps into a single, intuitive interface. {/* Reused from main description as per copyright.mdc */}
+              Morr.ai centralizes data from your apps into a single, intuitive interface. {/* Reused from main description as per copyright.mdc */}
             </p>
           </div>
         </div>
