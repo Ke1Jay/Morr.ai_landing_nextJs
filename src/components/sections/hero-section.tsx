@@ -1,6 +1,10 @@
-import React from 'react'
+'use client'
+
+import React, { Suspense } from 'react'
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import { ErrorBoundary } from 'react-error-boundary'
+import { ToolIcon } from "@/components/ui/tool-icon"
 import { 
   SlackIcon, 
   DriveIcon, 
@@ -9,33 +13,62 @@ import {
   PipedriveIcon 
 } from "@/components/icons"
 
-// Enhanced Tool Icon component with logo
-const ToolIcon = ({ name, icon: Icon, delay = 0 }: { 
-  name: string, 
-  icon: React.ComponentType<{ className?: string }>, 
-  delay?: number 
-}) => {
-  return (
-    <div 
-      className={cn(
-        "flex items-center gap-2 px-4 py-2.5 rounded-lg bg-black/40 backdrop-blur-xl",
-        "border border-primary/20 shadow-lg shadow-primary/5 animate-float hover:border-primary/40 transition-colors",
-        delay ? `delay-${delay}` : ""
-      )}
-    >
-      <div className="flex items-center justify-center w-6 h-6 shrink-0">
-        <Icon className="w-full h-full text-primary/80" />
-      </div>
-      <span className="text-sm font-medium text-primary/80">{name}</span>
-    </div>
-  )
-}
-
 // Data point component
 const DataPoint = ({ value, label, className }: { value: string, label: string, className?: string }) => (
   <div className={cn("flex flex-col items-start gap-1", className)}>
     <div className="text-[2rem] font-bold tracking-tight text-[#00FF9D]">{value}</div>
     <div className="text-sm text-[#00FF9D]/70">{label}</div>
+  </div>
+)
+
+// Arrow icon component for better reusability
+const ArrowIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 h-4 w-4 relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M5 12h14M12 5l7 7-7 7"/>
+  </svg>
+)
+
+// Trust indicator component for better organization
+const TrustIndicator = () => (
+  <div className="pt-8 border-t border-primary/10">
+    <p className="text-sm text-muted-foreground/60 mb-4">Trusted by forward-thinking teams</p>
+    <div className="flex items-center gap-6">
+      <div className="h-8 w-24 bg-primary/5 rounded animate-pulse" />
+      <div className="h-8 w-24 bg-primary/5 rounded animate-pulse delay-150" />
+      <div className="h-8 w-24 bg-primary/5 rounded animate-pulse delay-300" />
+    </div>
+  </div>
+)
+
+// Status card component for better reusability
+const StatusCard = ({ title, subtitle, icon }: { title: string, subtitle: string, icon: React.ReactNode }) => (
+  <div className="p-4 rounded-lg bg-black/40 backdrop-blur-xl border border-[#00FF9D]/10 shadow-lg">
+    <div className="flex items-center gap-3">
+      <div className="w-10 h-10 rounded-full bg-[#00FF9D]/20 flex items-center justify-center shadow-[0_0_15px] shadow-[#00FF9D]/20">
+        {icon}
+      </div>
+      <div className="flex-1">
+        <p className="text-base font-medium text-[#00FF9D]">{title}</p>
+        <p className="text-sm text-[#00FF9D]/50">{subtitle}</p>
+      </div>
+    </div>
+  </div>
+)
+
+// Fallback component for error states
+const IconErrorFallback = ({ error }: { error: unknown }) => {
+  console.error('Icon failed to load:', error)
+  return (
+    <div className="p-4 rounded-lg bg-red-500/10 border border-red-500/20">
+      <p className="text-sm text-red-500">Failed to load icon</p>
+    </div>
+  )
+}
+
+// Loading fallback for Suspense
+const IconLoadingFallback = () => (
+  <div className="p-4 rounded-lg bg-black/40 animate-pulse">
+    <div className="h-6 w-24 bg-primary/10 rounded" />
   </div>
 )
 
@@ -79,9 +112,7 @@ export function HeroSection() {
               <Button size="lg" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-primary-foreground group relative overflow-hidden">
                 <span className="relative z-10">Get Early Access</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-primary/50 to-primary opacity-0 group-hover:opacity-100 transition-opacity" />
-                <svg xmlns="http://www.w3.org/2000/svg" className="ml-2 h-4 w-4 relative z-10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
+                <ArrowIcon />
               </Button>
               <Button variant="outline" size="lg" className="w-full sm:w-auto border-primary/20 hover:bg-primary/5">
                 Request Demo
@@ -91,15 +122,7 @@ export function HeroSection() {
               </Button>
             </div>
 
-            {/* Trust indicators */}
-            <div className="pt-8 border-t border-primary/10">
-              <p className="text-sm text-muted-foreground/60 mb-4">Trusted by forward-thinking teams</p>
-              <div className="flex items-center gap-6">
-                <div className="h-8 w-24 bg-primary/5 rounded animate-pulse" />
-                <div className="h-8 w-24 bg-primary/5 rounded animate-pulse delay-150" />
-                <div className="h-8 w-24 bg-primary/5 rounded animate-pulse delay-300" />
-              </div>
-            </div>
+            <TrustIndicator />
           </div>
 
           {/* Interactive Visual */}
@@ -111,25 +134,29 @@ export function HeroSection() {
               {/* Tool Icons */}
               <div className="absolute inset-0">
                 {/* Top row */}
-                <div className="absolute top-[8%] left-[5%]">
-                  <ToolIcon name="Slack" icon={SlackIcon} />
-                </div>
-                <div className="absolute top-[12%] right-[8%]">
-                  <ToolIcon name="Drive" icon={DriveIcon} delay={150} />
-                </div>
-                
-                {/* Middle row */}
-                <div className="absolute top-[40%] right-[5%]">
-                  <ToolIcon name="Fireflies" icon={FirefliesIcon} delay={300} />
-                </div>
-                
-                {/* Bottom row */}
-                <div className="absolute bottom-[15%] left-[8%]">
-                  <ToolIcon name="Notion" icon={NotionIcon} delay={450} />
-                </div>
-                <div className="absolute bottom-[10%] right-[10%]">
-                  <ToolIcon name="Pipedrive" icon={PipedriveIcon} delay={600} />
-                </div>
+                <ErrorBoundary FallbackComponent={IconErrorFallback}>
+                  <Suspense fallback={<IconLoadingFallback />}>
+                    <div className="absolute top-[8%] left-[5%]">
+                      <ToolIcon name="Slack" icon={SlackIcon} />
+                    </div>
+                    <div className="absolute top-[12%] right-[8%]">
+                      <ToolIcon name="Drive" icon={DriveIcon} delay={150} />
+                    </div>
+                    
+                    {/* Middle row */}
+                    <div className="absolute top-[40%] right-[5%]">
+                      <ToolIcon name="Fireflies" icon={FirefliesIcon} delay={300} />
+                    </div>
+                    
+                    {/* Bottom row */}
+                    <div className="absolute bottom-[15%] left-[8%]">
+                      <ToolIcon name="Notion" icon={NotionIcon} delay={450} />
+                    </div>
+                    <div className="absolute bottom-[10%] right-[10%]">
+                      <ToolIcon name="Pipedrive" icon={PipedriveIcon} delay={600} />
+                    </div>
+                  </Suspense>
+                </ErrorBoundary>
               </div>
 
               {/* Data Points */}
@@ -172,43 +199,13 @@ export function HeroSection() {
             {/* Status Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
               {/* Status Card 1 */}
-              <div className="p-4 rounded-lg bg-black/40 backdrop-blur-xl border border-[#00FF9D]/10 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#00FF9D]/20 flex items-center justify-center shadow-[0_0_15px] shadow-[#00FF9D]/20">
-                    <div className="w-5 h-5 rounded-full bg-[#00FF9D] animate-ping" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-base font-medium text-[#00FF9D]">Real-time insights</p>
-                    <p className="text-sm text-[#00FF9D]/50">Processing data...</p>
-                  </div>
-                </div>
-              </div>
+              <StatusCard title="Real-time insights" subtitle="Processing data..." icon={<div className="w-5 h-5 rounded-full bg-[#00FF9D] animate-ping" />} />
 
               {/* Status Card 2 */}
-              <div className="p-4 rounded-lg bg-black/40 backdrop-blur-xl border border-[#00FF9D]/10 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#00FF9D]/20 flex items-center justify-center shadow-[0_0_15px] shadow-[#00FF9D]/20">
-                    <div className="w-5 h-5 rounded-full bg-[#00FF9D] animate-bounce" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-base font-medium text-[#00FF9D]">Proactive workflows</p>
-                    <p className="text-sm text-[#00FF9D]/50">Next meeting prep ready</p>
-                  </div>
-                </div>
-              </div>
+              <StatusCard title="Proactive workflows" subtitle="Next meeting prep ready" icon={<div className="w-5 h-5 rounded-full bg-[#00FF9D] animate-bounce" />} />
 
               {/* Status Card 3 */}
-              <div className="p-4 rounded-lg bg-black/40 backdrop-blur-xl border border-[#00FF9D]/10 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-[#00FF9D]/20 flex items-center justify-center shadow-[0_0_15px] shadow-[#00FF9D]/20">
-                    <div className="w-5 h-5 rounded-full bg-[#00FF9D] animate-pulse" />
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-base font-medium text-[#00FF9D]">Smart Automation</p>
-                    <p className="text-sm text-[#00FF9D]/50">Tasks optimized</p>
-                  </div>
-                </div>
-              </div>
+              <StatusCard title="Smart Automation" subtitle="Tasks optimized" icon={<div className="w-5 h-5 rounded-full bg-[#00FF9D] animate-pulse" />} />
             </div>
           </div>
         </div>
