@@ -1,0 +1,11 @@
+export { default as DriveIcon } from './drive-icon';
+export { default as FirefliesIcon } from './fireflies-icon';
+export { default as GmailIcon } from './gmail-icon';
+export { default as HubSpotIcon } from './hubspot-icon';
+export { default as LinkedInIcon } from './linkedin-icon';
+export { default as Microsoft365Icon } from './microsoft365-icon';
+export { default as NotionIcon } from './notion-icon';
+export { default as OutlookIcon } from './outlook-icon';
+export { default as PipedriveIcon } from './pipedrive-icon';
+export { default as SalesforceIcon } from './salesforce-icon';
+export { default as SlackIcon } from './slack-icon'; 
