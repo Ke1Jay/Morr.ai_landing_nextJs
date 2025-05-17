@@ -1,5 +1,6 @@
 import React from 'react'
 import Link from "next/link"
+import { MorraiLogo } from "@/components/icons"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -15,16 +16,7 @@ import {
 // Displays the Morr.ai logo as an SVG.
 // React.memo is used for performance optimization, preventing re-renders if props don't change.
 const Logo = React.memo(() => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    fill="currentColor"
-    className="h-6 w-6"
-    aria-labelledby="logoTitle"
-  >
-    <title id="logoTitle">Morr.ai Logo</title>
-    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5-10-5-10 5z" />
-  </svg>
+  <MorraiLogo className="h-8 w-auto" aria-labelledby="logoTitle" />
 ))
 Logo.displayName = "Logo" // Useful for debugging in React DevTools.
 

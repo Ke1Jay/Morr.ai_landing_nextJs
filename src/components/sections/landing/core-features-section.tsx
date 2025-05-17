@@ -4,11 +4,9 @@ import { Card } from "@/components/ui/card"
 import { 
   SlackIcon, 
   NotionIcon, 
-  DriveIcon, 
-  SalesforceIcon, 
-  HubSpotIcon, 
-  PipedriveIcon 
+  DriveIcon 
 } from "@/components/icons"
+import { IntegrationsGrid } from "@/components/ui/integrations-grid"
 
 // Feature card props interface
 interface FeatureCardProps {
@@ -122,32 +120,8 @@ const WorkflowVisual = () => (
 )
 
 const IntegrationsVisual = () => (
-  <div className="relative w-full h-[180px] bg-[#0C1615] rounded-xl p-6 mb-6">
-    <div className="grid grid-cols-3 gap-4">
-      <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-emerald-900/30 p-3 transition-colors hover:bg-emerald-900/40">
-        <SlackIcon className="w-full h-full text-emerald-500/80" />
-      </div>
-      <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-emerald-900/30 p-3 transition-colors hover:bg-emerald-900/40">
-        <NotionIcon className="w-full h-full text-emerald-500/80" />
-      </div>
-      <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-emerald-900/30 p-3 transition-colors hover:bg-emerald-900/40">
-        <DriveIcon className="w-full h-full text-emerald-500/80" />
-      </div>
-      <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-emerald-900/30 p-3 transition-colors hover:bg-emerald-900/40">
-        <SalesforceIcon className="w-full h-full text-emerald-500/80" />
-      </div>
-      <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-emerald-900/30 p-3 transition-colors hover:bg-emerald-900/40">
-        <HubSpotIcon className="w-full h-full text-emerald-500/80" />
-      </div>
-      <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-emerald-900/30 p-3 transition-colors hover:bg-emerald-900/40">
-        <PipedriveIcon className="w-full h-full text-emerald-500/80" />
-      </div>
-    </div>
-    {/* Connection indicator */}
-    <div className="absolute bottom-4 right-4">
-      <div className="w-3 h-3 rounded-full bg-emerald-500 animate-ping" />
-      <div className="w-3 h-3 rounded-full bg-emerald-500 absolute inset-0" />
-    </div>
+  <div className="relative w-full h-[180px] mb-6">
+    <IntegrationsGrid />
   </div>
 )
 
@@ -257,7 +231,7 @@ export function CoreFeaturesSection() {
               <span>Core Features</span>
             </div>
             <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-center mx-auto">
-              ⚙️ Key Features of <span className="text-primary">Morr.ai</span>
+              Key Features of <span className="text-primary">Morr.ai</span>
             </h2>
             <p className="mt-6 sm:max-w-xs lg:max-w-lg sm:text-lg md:text-xl text-muted-foreground/80 text-center mx-auto">
               Experience the power of proactive AI that understands your needs before you ask.
@@ -266,7 +240,7 @@ export function CoreFeaturesSection() {
         </div>
 
         {/* Features grid */}
-        <div className="mx-auto grid max-w-xl xl:max-w-5xl items-start gap-8 sm:grid-cols-1 lg:grid-cols-2 pt-16">
+        <div className="mx-auto grid max-w-full xl:max-w-5xl items-start gap-8 sm:grid-cols-1 lg:grid-cols-2 pt-16">
           {FEATURES.map((feature) => (
             <FeatureCard
               key={feature.title}
