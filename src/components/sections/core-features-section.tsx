@@ -1,87 +1,278 @@
 import React from 'react'
+import { cn } from "@/lib/utils"
+import { Card } from "@/components/ui/card"
+import { 
+  SlackIcon, 
+  NotionIcon, 
+  DriveIcon, 
+  SalesforceIcon, 
+  HubSpotIcon, 
+  PipedriveIcon 
+} from "@/components/icons"
 
-// Placeholder icons (replace with actual icons or SVGs later)
-const PlaceholderIcon = ({ className }: { className?: string }) => (
-  <svg
-    className={className}
-    xmlns="http://www.w3.org/2000/svg"
-    width="24"
-    height="24"
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-  >
-    <circle cx="12" cy="12" r="10" />
-  </svg>
+// Feature card props interface
+interface FeatureCardProps {
+  icon: string
+  title: string
+  description?: string
+  bulletPoints?: string[]
+  className?: string
+  visual: React.ReactNode
+}
+
+// Visual components for each feature
+const UnifiedSearchVisual = () => (
+  <div className="relative w-full h-[180px] bg-[#0C1615] rounded-xl overflow-hidden">
+    {/* Inner container with darker background */}
+    <div className="absolute inset-4 bg-[#070C0B] rounded-lg p-4">
+      {/* Search bar */}
+      <div className="flex items-center gap-2 mb-3">
+        <svg
+          className="w-4 h-4 text-emerald-500/80 shrink-0"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+        <div className="text-sm text-emerald-500/50 truncate">Summarize Q2 product updates</div>
+      </div>
+
+      {/* Response text */}
+      <div className="mb-4">
+        <p className="text-sm text-emerald-900/70 leading-relaxed line-clamp-2">
+          Key updates: New AI workflow automation launched, 3 major integrations added, and user engagement up 40%. Team highlights shared in Slack and full report in Drive.
+        </p>
+      </div>
+
+      {/* Sources row */}
+      <div className="flex items-center gap-2">
+        <div className="flex -space-x-1.5">
+          <div className="w-4 h-4 rounded-sm bg-emerald-900/40 flex items-center justify-center">
+            <SlackIcon className="w-2.5 h-2.5 text-emerald-500/80" />
+          </div>
+          <div className="w-4 h-4 rounded-sm bg-emerald-900/40 flex items-center justify-center">
+            <NotionIcon className="w-2.5 h-2.5 text-emerald-500/80" />
+          </div>
+          <div className="w-4 h-4 rounded-sm bg-emerald-900/40 flex items-center justify-center">
+            <DriveIcon className="w-2.5 h-2.5 text-emerald-500/80" />
+          </div>
+        </div>
+        <span className="text-[10px] text-emerald-500">3 sources</span>
+      </div>
+    </div>
+  </div>
 )
+
+const AnalyticsVisual = () => (
+  <div className="relative w-full h-[180px] bg-[#0C1615] rounded-xl p-6 mb-6">
+    <div className="flex items-end justify-between h-[100px] px-2">
+      {[30, 45, 60, 75, 90].map((height, i) => (
+        <div 
+          key={i}
+          className={cn(
+            "w-4 bg-emerald-500/40 rounded-t-sm transition-all duration-500",
+            i === 4 ? "animate-pulse bg-emerald-500/60" : ""
+          )}
+          style={{ height: `${height}%` }}
+        />
+      ))}
+    </div>
+    <div className="absolute bottom-6 left-6 right-6 h-[1px] bg-emerald-900/50" />
+    {/* Time indicators */}
+    <div className="absolute bottom-2 left-6 right-6 flex justify-between">
+      <div className="w-3 h-3 rounded-full bg-emerald-900/30" />
+      <div className="w-3 h-3 rounded-full bg-emerald-900/30" />
+      <div className="w-3 h-3 rounded-full bg-emerald-900/30" />
+      <div className="w-3 h-3 rounded-full bg-emerald-900/30" />
+      <div className="w-3 h-3 rounded-full bg-emerald-900/30" />
+    </div>
+  </div>
+)
+
+const WorkflowVisual = () => (
+  <div className="relative w-full h-[180px] bg-[#0C1615] rounded-xl p-6 mb-6">
+    <div className="flex items-center justify-between">
+      {/* Workflow steps */}
+      <div className="flex items-center w-full">
+        <div className="relative">
+          <div className="w-10 h-10 rounded-lg bg-emerald-900/50" />
+          <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-emerald-500" />
+        </div>
+        <div className="flex-1 h-[2px] bg-emerald-900/30" />
+        <div className="relative">
+          <div className="w-10 h-10 rounded-lg bg-emerald-900/50" />
+          <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
+        </div>
+        <div className="flex-1 h-[2px] bg-emerald-900/30" />
+        <div className="w-10 h-10 rounded-lg bg-emerald-900/50" />
+      </div>
+    </div>
+    {/* Status text lines */}
+    <div className="mt-6 space-y-3">
+      <div className="h-3 w-3/4 bg-emerald-900/30 rounded-full" />
+      <div className="h-3 w-1/2 bg-emerald-900/30 rounded-full" />
+    </div>
+  </div>
+)
+
+const IntegrationsVisual = () => (
+  <div className="relative w-full h-[180px] bg-[#0C1615] rounded-xl p-6 mb-6">
+    <div className="grid grid-cols-3 gap-4">
+      <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-emerald-900/30 p-3 transition-colors hover:bg-emerald-900/40">
+        <SlackIcon className="w-full h-full text-emerald-500/80" />
+      </div>
+      <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-emerald-900/30 p-3 transition-colors hover:bg-emerald-900/40">
+        <NotionIcon className="w-full h-full text-emerald-500/80" />
+      </div>
+      <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-emerald-900/30 p-3 transition-colors hover:bg-emerald-900/40">
+        <DriveIcon className="w-full h-full text-emerald-500/80" />
+      </div>
+      <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-emerald-900/30 p-3 transition-colors hover:bg-emerald-900/40">
+        <SalesforceIcon className="w-full h-full text-emerald-500/80" />
+      </div>
+      <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-emerald-900/30 p-3 transition-colors hover:bg-emerald-900/40">
+        <HubSpotIcon className="w-full h-full text-emerald-500/80" />
+      </div>
+      <div className="flex items-center justify-center w-16 h-16 rounded-xl bg-emerald-900/30 p-3 transition-colors hover:bg-emerald-900/40">
+        <PipedriveIcon className="w-full h-full text-emerald-500/80" />
+      </div>
+    </div>
+    {/* Connection indicator */}
+    <div className="absolute bottom-4 right-4">
+      <div className="w-3 h-3 rounded-full bg-emerald-500 animate-ping" />
+      <div className="w-3 h-3 rounded-full bg-emerald-500 absolute inset-0" />
+    </div>
+  </div>
+)
+
+// Individual feature card component
+const FeatureCard = ({ 
+  icon, 
+  title, 
+  description, 
+  bulletPoints, 
+  className,
+  visual
+}: FeatureCardProps) => (
+  <Card 
+    className={cn(
+      "group relative grid gap-2 p-6 rounded-xl border border-primary/10",
+      "bg-black/40 backdrop-blur-xl hover:bg-black/50 transition-all duration-300",
+      "hover:border-primary/20",
+      className
+    )}
+  >
+    {/* Visual element */}
+    {visual}
+    
+    {/* Content */}
+    <div className="relative z-10">
+      <div className="flex items-center gap-3 mb-4">
+        <span className="text-2xl">{icon}</span>
+        <h3 className="text-xl font-bold text-primary/90">
+          {title}
+        </h3>
+      </div>
+      
+      {description && (
+        <p className="text-base text-muted-foreground/80 leading-relaxed mb-3">
+          {description}
+        </p>
+      )}
+      
+      {bulletPoints && bulletPoints.length > 0 && (
+        <ul className="space-y-2">
+          {bulletPoints.map((point, index) => (
+            <li key={index} className="flex items-start gap-2 text-muted-foreground/80">
+              <span className="text-primary/60 text-sm mt-1">•</span>
+              <span className="text-sm leading-relaxed">{point}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+
+    {/* Decorative corner accent */}
+    <div className="absolute -bottom-0 -right-0 w-8 h-8 bg-gradient-to-br from-primary/20 to-transparent rounded-tl-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+  </Card>
+)
+
+// Core features data
+const FEATURES = [
+  {
+    icon: "🔍",
+    title: "Unified Search & AI Chat",
+    description: "Ask anything. Get clear answers immediately—from Slack, Google Drive, Notion, CRM platforms, and more.",
+    bulletPoints: [
+      "Summarize Q2 product updates",
+      "What did John say about pricing last week?",
+      "What's the latest on the Acme deal?"
+    ],
+    visual: <UnifiedSearchVisual />
+  },
+  {
+    icon: "📊",
+    title: "Real-Time Insights, Delivered Proactively",
+    bulletPoints: [
+      "Morr.ai delivers meeting briefs ahead of time",
+      "Up-to-the-minute sales insights",
+      "Project status updates without asking"
+    ],
+    visual: <AnalyticsVisual />
+  },
+  {
+    icon: "🤖",
+    title: "Automated, Proactive AI Workflows",
+    bulletPoints: [
+      "Generates meeting briefs automatically",
+      "Flags overlooked tasks",
+      "Prepares weekly team updates",
+      "Delivers reports proactively"
+    ],
+    visual: <WorkflowVisual />
+  },
+  {
+    icon: "🔗",
+    title: "Seamless Integrations",
+    description: "Works with Slack, Google Drive, Notion, Pipedrive, HubSpot, Salesforce, Jira, Asana, Trello—and more. No workflow changes required.",
+    visual: <IntegrationsVisual />
+  }
+]
 
 export function CoreFeaturesSection() {
   return (
-    <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
+    <section className="w-full min-h-[40vh] flex items-center justify-center bg-background pt-16 lg:pt-8 pb-24 md:pb-32 lg:pb-40">
       <div className="container px-4 md:px-6">
-        <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
-          <div className="space-y-2">
-            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">⚙️ Key Features of Morr.ai</h2>
+        {/* Section header */}
+        <div className="flex flex-col items-center justify-center space-y-4 text-center">
+          <div className="space-y-2 max-w-[900px]">
+            <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm text-primary/80 mb-4">
+              <div className="h-2 w-2 rounded-full bg-primary animate-pulse mr-2" />
+              <span>Core Features</span>
+            </div>
+            <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl text-center mx-auto">
+              ⚙️ Key Features of <span className="text-primary">Morr.ai</span>
+            </h2>
+            <p className="mt-6 sm:max-w-xs lg:max-w-lg sm:text-lg md:text-xl text-muted-foreground/80 text-center mx-auto">
+              Experience the power of proactive AI that understands your needs before you ask.
+            </p>
           </div>
         </div>
-        <div className="mx-auto grid max-w-5xl items-start gap-8 sm:grid-cols-2 md:gap-12 lg:grid-cols-2">
-          {/* Feature 1: Unified Search & AI Chat */}
-          <div className="grid gap-2 p-6 rounded-lg border bg-card text-card-foreground shadow-sm">
-            <div className="flex items-center gap-2">
-              <PlaceholderIcon className="h-6 w-6 text-primary" />
-              <h3 className="text-xl font-bold">🔍 Unified Search & AI Chat</h3>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Ask anything. Get clear answers immediately—from Slack, Google Drive, Notion, CRM platforms, and more.
-            </p>
-            <ul className="list-disc list-inside text-sm text-muted-foreground pl-4 space-y-1 mt-2">
-              <li>&quot;Summarize Q2 product updates.&quot;</li>
-              <li>&quot;What did John say about pricing last week?&quot;</li>
-              <li>&quot;What&apos;s the latest on the Acme deal?&quot;</li>
-            </ul>
-          </div>
 
-          {/* Feature 2: Real-Time Insights */}
-          <div className="grid gap-2 p-6 rounded-lg border bg-card text-card-foreground shadow-sm">
-            <div className="flex items-center gap-2">
-              <PlaceholderIcon className="h-6 w-6 text-primary" />
-              <h3 className="text-xl font-bold">📊 Real-Time Insights, Delivered Proactively</h3>
-            </div>
-            <ul className="list-disc list-inside text-sm text-muted-foreground pl-4 space-y-1 mt-2">
-              <li>Morr.ai delivers meeting briefs ahead of time</li>
-              <li>Up-to-the-minute sales insights</li>
-              <li>Project status updates without asking</li>
-            </ul>
-          </div>
-
-          {/* Feature 3: Automated, Proactive AI Workflows */}
-          <div className="grid gap-2 p-6 rounded-lg border bg-card text-card-foreground shadow-sm">
-            <div className="flex items-center gap-2">
-              <PlaceholderIcon className="h-6 w-6 text-primary" />
-              <h3 className="text-xl font-bold">🤖 Automated, Proactive AI Workflows</h3>
-            </div>
-            <ul className="list-disc list-inside text-sm text-muted-foreground pl-4 space-y-1 mt-2">
-              <li>Generates meeting briefs automatically</li>
-              <li>Flags overlooked tasks</li>
-              <li>Prepares weekly team updates</li>
-              <li>Delivers reports proactively</li>
-            </ul>
-          </div>
-
-          {/* Feature 4: Seamless Integrations */}
-          <div className="grid gap-2 p-6 rounded-lg border bg-card text-card-foreground shadow-sm">
-            <div className="flex items-center gap-2">
-              <PlaceholderIcon className="h-6 w-6 text-primary" />
-              <h3 className="text-xl font-bold">🔗 Seamless Integrations</h3>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Works with Slack, Google Drive, Notion, Pipedrive, HubSpot, Salesforce, Jira, Asana, Trello—and more.
-              No workflow changes required.
-            </p>
-          </div>
+        {/* Features grid */}
+        <div className="mx-auto grid max-w-xl xl:max-w-5xl items-start gap-8 sm:grid-cols-1 lg:grid-cols-2 pt-16">
+          {FEATURES.map((feature) => (
+            <FeatureCard
+              key={feature.title}
+              {...feature}
+            />
+          ))}
         </div>
       </div>
     </section>
