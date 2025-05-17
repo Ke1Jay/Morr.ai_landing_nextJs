@@ -3,6 +3,7 @@ import { cn } from "@/lib/utils"
 import { Card } from "@/components/ui/card"
 import { IntegrationsGrid } from "@/components/ui/integrations-grid"
 import { UnifiedSearch } from "@/components/ui/unified-search"
+import { WorkflowSteps } from "@/components/ui/workflow-steps"
 
 // Feature card props interface
 interface FeatureCardProps {
@@ -48,28 +49,8 @@ const AnalyticsVisual = () => (
 )
 
 const WorkflowVisual = () => (
-  <div className="relative w-full h-[180px] bg-[#0C1615] rounded-xl p-6 mb-6">
-    <div className="flex items-center justify-between">
-      {/* Workflow steps */}
-      <div className="flex items-center w-full">
-        <div className="relative">
-          <div className="w-10 h-10 rounded-lg bg-emerald-900/50" />
-          <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-emerald-500" />
-        </div>
-        <div className="flex-1 h-[2px] bg-emerald-900/30" />
-        <div className="relative">
-          <div className="w-10 h-10 rounded-lg bg-emerald-900/50" />
-          <div className="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
-        </div>
-        <div className="flex-1 h-[2px] bg-emerald-900/30" />
-        <div className="w-10 h-10 rounded-lg bg-emerald-900/50" />
-      </div>
-    </div>
-    {/* Status text lines */}
-    <div className="mt-6 space-y-3">
-      <div className="h-3 w-3/4 bg-emerald-900/30 rounded-full" />
-      <div className="h-3 w-1/2 bg-emerald-900/30 rounded-full" />
-    </div>
+  <div className="relative w-full h-[180px]">
+    <WorkflowSteps className="h-full" />
   </div>
 )
 
