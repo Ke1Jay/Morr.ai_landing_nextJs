@@ -1,12 +1,8 @@
 import React from 'react'
 import { cn } from "@/lib/utils"
 import { Card } from "@/components/ui/card"
-import { 
-  SlackIcon, 
-  NotionIcon, 
-  DriveIcon 
-} from "@/components/icons"
 import { IntegrationsGrid } from "@/components/ui/integrations-grid"
+import { UnifiedSearch } from "@/components/ui/unified-search"
 
 // Feature card props interface
 interface FeatureCardProps {
@@ -20,50 +16,8 @@ interface FeatureCardProps {
 
 // Visual components for each feature
 const UnifiedSearchVisual = () => (
-  <div className="relative w-full h-[180px] bg-[#0C1615] rounded-xl overflow-hidden">
-    {/* Inner container with darker background */}
-    <div className="absolute inset-4 bg-[#070C0B] rounded-lg p-4">
-      {/* Search bar */}
-      <div className="flex items-center gap-2 mb-3">
-        <svg
-          className="w-4 h-4 text-emerald-500/80 shrink-0"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <circle cx="11" cy="11" r="8" />
-          <path d="m21 21-4.3-4.3" />
-        </svg>
-        <div className="text-sm text-emerald-500/50 truncate">Summarize Q2 product updates</div>
-      </div>
-
-      {/* Response text */}
-      <div className="mb-4">
-        <p className="text-sm text-emerald-900/70 leading-relaxed line-clamp-2">
-          Key updates: New AI workflow automation launched, 3 major integrations added, and user engagement up 40%. Team highlights shared in Slack and full report in Drive.
-        </p>
-      </div>
-
-      {/* Sources row */}
-      <div className="flex items-center gap-2">
-        <div className="flex -space-x-1.5">
-          <div className="w-4 h-4 rounded-sm bg-emerald-900/40 flex items-center justify-center">
-            <SlackIcon className="w-2.5 h-2.5 text-emerald-500/80" />
-          </div>
-          <div className="w-4 h-4 rounded-sm bg-emerald-900/40 flex items-center justify-center">
-            <NotionIcon className="w-2.5 h-2.5 text-emerald-500/80" />
-          </div>
-          <div className="w-4 h-4 rounded-sm bg-emerald-900/40 flex items-center justify-center">
-            <DriveIcon className="w-2.5 h-2.5 text-emerald-500/80" />
-          </div>
-        </div>
-        <span className="text-[10px] text-emerald-500">3 sources</span>
-      </div>
-    </div>
+  <div className="relative w-full h-[180px]">
+    <UnifiedSearch className="h-full" />
   </div>
 )
 
