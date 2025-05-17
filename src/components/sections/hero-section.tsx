@@ -74,24 +74,21 @@ const IconLoadingFallback = () => (
 
 export function HeroSection() {
   return (
-    <section className="relative w-full min-h-[90vh] flex items-center justify-center bg-[#0A0A0A] overflow-hidden">
+    <section className="relative w-full min-h-[90vh] flex items-center justify-center bg-background overflow-hidden">
       {/* Background gradient effect */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37,99,75,0.1)_0%,transparent_65%)]" />
       </div>
       
-      {/* Ambient glow effects */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute top-1/4 -left-4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px] animate-pulse" />
-        <div className="absolute bottom-1/4 -right-4 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-[100px] animate-pulse delay-700" />
-      </div>
-
       <div className="container relative px-4 md:px-6 z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
-          <div className="flex flex-col space-y-8">
-            <div className="space-y-6">
+          <div className="flex flex-col space-y-8 relative">
+            {/* Glow effect for text content */}
+            {/* <div className="absolute -inset-10 w-full h-[120%] bg-primary/5 rounded-full blur-[100px] animate-pulse" /> */}
+            
+            <div className="relative space-y-6">
               <div className="inline-block">
                 <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/5 px-3 py-1 text-sm text-primary/80">
                   <div className="h-2 w-2 rounded-full bg-primary animate-pulse mr-2" />
@@ -127,6 +124,9 @@ export function HeroSection() {
 
           {/* Interactive Visual */}
           <div className="relative lg:block">
+            {/* Glow effect for visual content */}
+            {/* <div className="absolute -inset-10 w-full h-[120%] bg-secondary/5 rounded-full blur-[100px] animate-pulse delay-700" /> */}
+            
             <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-black/40 backdrop-blur-3xl border border-primary/10 shadow-[0_0_50px_-12px] shadow-primary/20">
               {/* Grid pattern */}
               <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,75,0.1)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,75,0.1)_1px,transparent_1px)] bg-[size:32px_32px]" />
