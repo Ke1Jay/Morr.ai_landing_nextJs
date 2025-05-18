@@ -27,12 +27,17 @@ const config: Config = {
         draw: {
           '0%': { strokeDashoffset: '1000' },
           '100%': { strokeDashoffset: '0' }
+        },
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
         }
       },
       animation: {
         'orbit': 'orbit 20s linear infinite',
         'float': 'float 3s ease-in-out infinite',
-        'draw': 'draw 2s ease-out forwards'
+        'draw': 'draw 2s ease-out forwards',
+        'fade-in': 'fadeIn 0.5s ease-out forwards'
       }
     },
   },
