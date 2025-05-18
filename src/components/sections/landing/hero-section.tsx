@@ -81,7 +81,7 @@ export function HeroSection() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37,99,75,0.1)_0%,transparent_65%)]" />
       </div>
       
-      <div className="container relative px-4 md:px-6 z-10">
+      <div className="container relative mt-12 px-4 md:px-6 z-10">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Content */}
           <div className="flex flex-col space-y-8 relative">
