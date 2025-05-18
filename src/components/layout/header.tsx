@@ -208,19 +208,19 @@ const navigationItems: NavigationItemConfig[] = [
     subItems: [
       {
         title: "Core Features",
-        href: "/features",
+        href: "/product/features",
         description: "Discover proactive AI, unified search, and real-time insights.",
         icon: <span>🚀</span>
       },
       {
         title: "Integrations",
-        href: "/integrations",
+        href: "/product/integrations",
         description: "Connect seamlessly with Slack, Google Drive, Salesforce, and more.",
         icon: <span>🔗</span>
       },
       {
         title: "Security & Trust",
-        href: "/security",
+        href: "/product/security",
         description: "Learn about our SOC 2-ready, GDPR-compliant infrastructure.",
         icon: <span>🔒</span>
       }
@@ -228,7 +228,7 @@ const navigationItems: NavigationItemConfig[] = [
     additionalContent: {
       title: "Learn More",
       items: [
-        { title: "Product Tour", href: "/product-tour" },
+        { title: "Product Overview", href: "/product" },
         { title: "How Morr.ai Works", href: "/how-it-works" },
         { title: "Roadmap", href: "/roadmap" }
       ]
@@ -238,25 +238,25 @@ const navigationItems: NavigationItemConfig[] = [
     title: "Use Cases",
     subItems: [
       {
-        title: "Proactive Meeting Briefs",
+        title: "Meeting Briefs",
         href: "/use-cases/meeting-briefs",
         description: "Arrive prepared with AI-generated summaries and key documents.",
         icon: <span>📅</span>
       },
       {
-        title: "Real-Time Sales Insights",
+        title: "Sales Insights",
         href: "/use-cases/sales-insights",
         description: "Access live pipeline data, trends, and next-step recommendations.",
         icon: <span>💼</span>
       },
       {
-        title: "Unified Knowledge Access",
+        title: "Unified Search",
         href: "/use-cases/unified-search",
         description: "Ask any question and get instant answers from all your connected tools.",
         icon: <span>🔍</span>
       },
       {
-        title: "Automated Team Updates",
+        title: "Team Updates",
         href: "/use-cases/team-updates",
         description: "Keep everyone in sync with proactive status reports and summaries.",
         icon: <span>👥</span>
