@@ -1,321 +1,392 @@
 'use client'
 
-import React, { useState, useEffect, useCallback, memo } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { cn } from "@/lib/utils"
 
-// Types
-interface WorkflowStep {
+interface Step {
   title: string
   description: string
 }
 
 interface WorkflowStepsProps {
   className?: string
-  steps?: WorkflowStep[]
-  cycleTime?: number
-  stepDuration?: number
 }
 
-interface StepCircleProps {
-  index: number
-  currentStep: number
-  activeStep: number
-  enableTransitions: boolean
-}
-
-interface ConnectorLineProps {
-  progress: number
-  enableTransitions: boolean
-  label: string
-}
-
-// Constants
-const DEFAULT_STEPS: WorkflowStep[] = [
+const STEPS: Step[] = [
   {
     title: "Gather Context",
     description: "Syncs recent emails, chats, and CRM data"
   },
   {
     title: "Prepare Brief",
-    description: "Generates smart meeting summary and action items"
+    description: "Generates smart meeting summary"
   },
   {
     title: "Deliver Insights",
-    description: "Proactively shares brief with recommended actions"
+    description: "Shares brief with recommended actions"
   }
 ]
 
-const ANIMATION_SETTINGS = {
-  LINE_INCREMENT: 1,
-  LINE_INTERVAL: 10,
-  TEXT_FADE_DURATION: 300,
-  COMPLETION_RESET_DELAY: 1000,
-  NEXT_STEP_DELAY: 300,
+const ANIMATION_TIMING = {
+  INITIAL_DELAY: 500,
+  STEP_DURATION: 2000,
+  LINE_ANIMATION_SPEED: 20,
+  COMPLETION_DELAY: 500,
+  COMPLETION_DURATION: 3000,
 } as const
 
-const PROCESS_LABELS = [
-  "Syncing data...",
-  "Processing..."
-] as const
+const CheckIcon = () => (
+  <svg className="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+  </svg>
+)
 
-// Components
-const CheckmarkIcon = memo(function CheckmarkIcon() {
-  return (
-    <svg className="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-    </svg>
-  )
-})
+const ProcessingDot = () => (
+  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+)
 
-const ProcessingDot = memo(function ProcessingDot() {
-  return <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-})
-
-const StepCircle = memo(function StepCircle({ 
-  index, 
-  currentStep,
-  activeStep,
-  enableTransitions 
-}: StepCircleProps) {
-  const isCompleted = index < currentStep
-  const isActive = index === activeStep && index === currentStep
-  const isHighlighted = index <= currentStep
-
-  return (
-    <div className="relative">
-      <div className={cn(
-        "w-10 h-10 rounded-xl flex items-center justify-center",
-        enableTransitions && "transition-colors duration-300",
-        isHighlighted ? "bg-emerald-500/20" : "bg-emerald-900/30"
-      )}>
-        {isCompleted && <CheckmarkIcon />}
-        {isActive && <ProcessingDot />}
-      </div>
-      <div className={cn(
-        "absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full",
-        enableTransitions && "transition-colors duration-300",
-        isHighlighted ? "bg-emerald-500" : "bg-emerald-900/50",
-        isActive && "animate-pulse"
-      )} />
-    </div>
-  )
-})
-
-const ProcessLabel = memo(function ProcessLabel({
-  label,
-  progress,
-  isActive
-}: {
-  label: string
-  progress: number
-  isActive: boolean
-}) {
-  return (
-    <div 
-      className={cn(
-        "absolute left-1/2 -translate-x-1/2 -bottom-9",
-        "transition-all duration-300 transform origin-top",
-        "w-24",
-        isActive && progress > 0 
-          ? "opacity-100 scale-100" 
-          : "opacity-0 scale-95"
-      )}
-    >
-      <div className="relative flex justify-center">
-        {/* Tooltip arrow */}
-        <div className="absolute -top-1 w-2 h-2 bg-[#132421] rotate-45 border-t border-l border-emerald-500/20" />
-        
-        {/* Tooltip content */}
-        <div className={cn(
-          "relative px-2.5 py-1.5 rounded-md",
-          "bg-[#132421] border border-emerald-500/20",
-          "shadow-lg shadow-emerald-500/5",
-          "min-w-full text-center"
-        )}>
-          <div className="flex items-center justify-center gap-1.5">
-            <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
-            <span className="text-[10px] font-medium tracking-wide text-emerald-500/90 whitespace-nowrap">
-              {label}
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  )
-})
-
-const ConnectorLine = memo(function ConnectorLine({ 
-  progress, 
-  enableTransitions,
-  label,
-  isActive
-}: ConnectorLineProps & { isActive: boolean }) {
-  return (
-    <div className="flex-1 mx-2 relative">
-      <div className="h-[2px] bg-emerald-900/30 relative overflow-hidden">
-        <div 
-          className={cn(
-            "absolute inset-0 bg-emerald-500 origin-left",
-            enableTransitions && "transition-transform duration-1000 ease-in-out"
-          )}
-          style={{ transform: `scaleX(${progress / 100})` }}
-        />
-      </div>
-      <ProcessLabel
-        label={label}
-        progress={progress}
-        isActive={isActive}
-      />
-    </div>
-  )
-})
-
-const CompletionMessage = memo(function CompletionMessage() {
-  return (
-    <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mb-3">
-      <CheckmarkIcon />
-    </div>
-  )
-})
-
-// Main component
-export function WorkflowSteps({ 
-  className,
-  steps = DEFAULT_STEPS,
-  cycleTime = 13000,
-  stepDuration = 3000
-}: WorkflowStepsProps) {
-  const [currentStep, setCurrentStep] = useState(0)
-  const [activeStep, setActiveStep] = useState(0)
-  const [showText, setShowText] = useState(true)
+export function WorkflowSteps({ className }: WorkflowStepsProps) {
+  const [currentStep, setCurrentStep] = useState(-1)
+  const [completedSteps, setCompletedSteps] = useState<number[]>([])
   const [lineProgress, setLineProgress] = useState<number[]>([0, 0])
   const [showCompletion, setShowCompletion] = useState(false)
-  const [enableTransitions, setEnableTransitions] = useState(true)
-  const [activeLineIndex, setActiveLineIndex] = useState<number | null>(null)
+  const [isAnimating, setIsAnimating] = useState(false)
+  const componentRef = useRef<HTMLDivElement>(null)
+  const lastVisibleTime = useRef<number>(Date.now())
+  const restartTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const animationRef = useRef<{ 
+    cleanup: boolean; 
+    timeouts: ReturnType<typeof setTimeout>[]; 
+    intervals: ReturnType<typeof setInterval>[];
+  }>({
+    cleanup: false,
+    timeouts: [],
+    intervals: [],
+  })
 
-  const resetWorkflow = useCallback(() => {
-    setEnableTransitions(false)
-    setCurrentStep(0)
-    setActiveStep(0)
+  const resetState = () => {
+    setCurrentStep(-1)
+    setCompletedSteps([])
     setLineProgress([0, 0])
-    setShowText(true)
-    setActiveLineIndex(null)
-  }, [])
+    setShowCompletion(false)
+    setIsAnimating(false)
+  }
 
-  const animateLine = useCallback((lineIndex: number): Promise<void> => {
+  const cleanup = () => {
+    animationRef.current.cleanup = true
+    animationRef.current.timeouts.forEach(clearTimeout)
+    animationRef.current.intervals.forEach(clearInterval)
+    animationRef.current.timeouts = []
+    animationRef.current.intervals = []
+    if (restartTimeoutRef.current) {
+      clearTimeout(restartTimeoutRef.current)
+      restartTimeoutRef.current = null
+    }
+    resetState()
+  }
+
+  const checkVisibility = () => {
+    if (!componentRef.current) return false
+    const rect = componentRef.current.getBoundingClientRect()
+    return (
+      rect.top < window.innerHeight &&
+      rect.bottom > 0 &&
+      rect.left < window.innerWidth &&
+      rect.right > 0 &&
+      !document.hidden
+    )
+  }
+
+  const startAnimation = () => {
+    // Clear any pending restart
+    if (restartTimeoutRef.current) {
+      clearTimeout(restartTimeoutRef.current)
+      restartTimeoutRef.current = null
+    }
+
+    // Only start if visible and not already animating
+    if (!checkVisibility() || isAnimating) return
+    
+    cleanup() // Ensure clean state
+    animationRef.current.cleanup = false
+    lastVisibleTime.current = Date.now()
+    runAnimation()
+  }
+
+  // Debounced restart function
+  const debouncedRestart = () => {
+    if (restartTimeoutRef.current) {
+      clearTimeout(restartTimeoutRef.current)
+    }
+    
+    restartTimeoutRef.current = setTimeout(() => {
+      if (checkVisibility()) {
+        startAnimation()
+      }
+      restartTimeoutRef.current = null
+    }, 300) // Wait 300ms before attempting to restart
+  }
+
+  const animateLine = (lineIndex: number): Promise<void> => {
     return new Promise((resolve) => {
-      setActiveLineIndex(lineIndex)
       let progress = 0
       const interval = setInterval(() => {
-        progress += ANIMATION_SETTINGS.LINE_INCREMENT
+        if (animationRef.current.cleanup) {
+          clearInterval(interval)
+          return
+        }
+
+        progress += 2
         setLineProgress(prev => 
           prev.map((val, i) => i === lineIndex ? Math.min(progress, 100) : val)
         )
+        
         if (progress >= 100) {
           clearInterval(interval)
-          setTimeout(() => {
-            setActiveLineIndex(null)
-            resolve()
-          }, 300) // Brief delay before hiding the label
+          resolve()
         }
-      }, ANIMATION_SETTINGS.LINE_INTERVAL)
+      }, ANIMATION_TIMING.LINE_ANIMATION_SPEED)
+      
+      animationRef.current.intervals.push(interval)
     })
-  }, [])
+  }
+
+  const runAnimation = async () => {
+    if (animationRef.current.cleanup || isAnimating) return
+    
+    try {
+      setIsAnimating(true)
+      resetState()
+
+      // Step 1
+      await new Promise(r => {
+        if (animationRef.current.cleanup) return
+        const t = setTimeout(r, ANIMATION_TIMING.INITIAL_DELAY)
+        animationRef.current.timeouts.push(t)
+      })
+      if (animationRef.current.cleanup) return
+      setCurrentStep(0)
+      
+      await new Promise(r => {
+        if (animationRef.current.cleanup) return
+        const t = setTimeout(r, ANIMATION_TIMING.STEP_DURATION)
+        animationRef.current.timeouts.push(t)
+      })
+      if (animationRef.current.cleanup) return
+      setCompletedSteps(prev => [...prev, 0])
+      
+      // Animate line to step 2
+      await animateLine(0)
+      if (animationRef.current.cleanup) return
+
+      // Step 2
+      setCurrentStep(1)
+      await new Promise(r => {
+        if (animationRef.current.cleanup) return
+        const t = setTimeout(r, ANIMATION_TIMING.STEP_DURATION)
+        animationRef.current.timeouts.push(t)
+      })
+      if (animationRef.current.cleanup) return
+      setCompletedSteps(prev => [...prev, 1])
+
+      // Animate line to step 3
+      await animateLine(1)
+      if (animationRef.current.cleanup) return
+
+      // Step 3
+      setCurrentStep(2)
+      await new Promise(r => {
+        if (animationRef.current.cleanup) return
+        const t = setTimeout(r, ANIMATION_TIMING.STEP_DURATION)
+        animationRef.current.timeouts.push(t)
+      })
+      if (animationRef.current.cleanup) return
+      setCompletedSteps(prev => [...prev, 2])
+
+      // Show completion
+      await new Promise(r => {
+        if (animationRef.current.cleanup) return
+        const t = setTimeout(r, ANIMATION_TIMING.COMPLETION_DELAY)
+        animationRef.current.timeouts.push(t)
+      })
+      if (animationRef.current.cleanup) return
+      setShowCompletion(true)
+
+      // Reset after completion
+      await new Promise(r => {
+        if (animationRef.current.cleanup) return
+        const t = setTimeout(r, ANIMATION_TIMING.COMPLETION_DURATION)
+        animationRef.current.timeouts.push(t)
+      })
+      if (animationRef.current.cleanup) return
+      
+      setIsAnimating(false)
+      runAnimation() // Start next cycle
+    } catch (error) {
+      console.error('Animation error:', error)
+      cleanup()
+    }
+  }
 
   useEffect(() => {
-    if (!steps.length) return
+    let visibilityTimeout: ReturnType<typeof setTimeout> | null = null
 
-    const animateStep = async (index: number, startTime: number) => {
-      if (index === 0) return
+    const handleVisibilityChange = () => {
+      // Clear any pending visibility timeout
+      if (visibilityTimeout) {
+        clearTimeout(visibilityTimeout)
+        visibilityTimeout = null
+      }
 
-      setTimeout(() => {
-        setCurrentStep(index)
-        
-        setTimeout(async () => {
-          setShowText(false)
-          await new Promise(resolve => setTimeout(resolve, ANIMATION_SETTINGS.TEXT_FADE_DURATION))
-          await animateLine(index - 1)
-          setActiveStep(index)
-          setShowText(true)
-        }, ANIMATION_SETTINGS.NEXT_STEP_DELAY)
-      }, startTime)
+      if (document.hidden) {
+        lastVisibleTime.current = Date.now()
+        cleanup()
+      } else {
+        // Wait a brief moment to ensure the tab is actually focused
+        visibilityTimeout = setTimeout(() => {
+          const timeSinceHidden = Date.now() - lastVisibleTime.current
+          if (timeSinceHidden > 200) { // Reduced time threshold for better responsiveness
+            cleanup()
+            debouncedRestart()
+          }
+          visibilityTimeout = null
+        }, 100)
+      }
     }
 
-    const animationCycle = () => {
-      setEnableTransitions(true)
-      resetWorkflow()
-      setShowCompletion(false)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !document.hidden) {
+            debouncedRestart()
+          } else {
+            cleanup()
+          }
+        })
+      },
+      { 
+        threshold: 0.3,
+        rootMargin: '100px 0px'
+      }
+    )
 
-      steps.forEach((_, index) => {
-        animateStep(index, index * stepDuration)
-      })
-
-      setTimeout(() => {
-        setShowCompletion(true)
-        setTimeout(resetWorkflow, ANIMATION_SETTINGS.COMPLETION_RESET_DELAY)
-      }, steps.length * stepDuration)
+    if (componentRef.current) {
+      observer.observe(componentRef.current)
+      
+      // Check initial visibility
+      if (checkVisibility()) {
+        startAnimation()
+      }
     }
 
-    animationCycle()
-    const interval = setInterval(animationCycle, cycleTime)
-    return () => clearInterval(interval)
-  }, [steps, cycleTime, stepDuration, resetWorkflow, animateLine])
+    // Add visibility change listener
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+    
+    // Debounced resize handler
+    let resizeTimeout: ReturnType<typeof setTimeout> | null = null
+    const handleResize = () => {
+      if (resizeTimeout) {
+        clearTimeout(resizeTimeout)
+      }
+      resizeTimeout = setTimeout(() => {
+        if (checkVisibility()) {
+          debouncedRestart()
+        }
+        resizeTimeout = null
+      }, 250)
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      cleanup()
+      observer.disconnect()
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      window.removeEventListener('resize', handleResize)
+      if (visibilityTimeout) clearTimeout(visibilityTimeout)
+      if (resizeTimeout) clearTimeout(resizeTimeout)
+      if (restartTimeoutRef.current) clearTimeout(restartTimeoutRef.current)
+    }
+  }, [])
 
   return (
-    <div className={cn(
-      "relative w-full h-full bg-[#0C1615] rounded-xl p-6",
-      className
-    )}>
+    <div 
+      ref={componentRef}
+      className={cn(
+        "relative w-full h-full bg-[#0C1615] rounded-xl p-6",
+        className
+      )}
+    >
       <div className="flex flex-col h-full">
+        {/* Main workflow visualization */}
         <div className={cn(
-          showCompletion ? "opacity-0" : "opacity-100",
-          enableTransitions ? "transition-all duration-500" : "transition-none"
+          "transition-opacity duration-500",
+          showCompletion ? "opacity-0" : "opacity-100"
         )}>
+          {/* Steps and connecting lines */}
           <div className="flex items-center justify-between mb-4">
-            {steps.map((_, index) => (
+            {STEPS.map((_, index) => (
               <React.Fragment key={index}>
-                <StepCircle 
-                  index={index}
-                  currentStep={currentStep}
-                  activeStep={activeStep}
-                  enableTransitions={enableTransitions}
-                />
-                {index < steps.length - 1 && (
-                  <ConnectorLine 
-                    progress={lineProgress[index]}
-                    enableTransitions={enableTransitions}
-                    label={PROCESS_LABELS[index]}
-                    isActive={activeLineIndex === index}
-                  />
+                {/* Step box */}
+                <div className="relative">
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-300",
+                    completedSteps.includes(index) || currentStep === index
+                      ? "bg-emerald-500/20"
+                      : "bg-emerald-900/30"
+                  )}>
+                    {completedSteps.includes(index) && <CheckIcon />}
+                    {currentStep === index && !completedSteps.includes(index) && <ProcessingDot />}
+                  </div>
+                  <div className={cn(
+                    "absolute -bottom-1 -right-1 w-2.5 h-2.5 rounded-full transition-colors duration-300",
+                    completedSteps.includes(index) || currentStep === index
+                      ? "bg-emerald-500"
+                      : "bg-emerald-900/50",
+                    currentStep === index && "animate-pulse"
+                  )} />
+                </div>
+
+                {/* Connecting line */}
+                {index < STEPS.length - 1 && (
+                  <div className="flex-1 mx-2">
+                    <div className="h-[2px] bg-emerald-900/30 relative overflow-hidden">
+                      <div 
+                        className="absolute inset-0 bg-emerald-500 origin-left transition-transform duration-500 ease-out"
+                        style={{ transform: `scaleX(${lineProgress[index] / 100})` }}
+                      />
+                    </div>
+                  </div>
                 )}
               </React.Fragment>
             ))}
           </div>
 
-          <div className="h-12">
-            <div 
-              className={cn(
-                enableTransitions && "transition-all duration-300",
-                showText ? "opacity-100 transform translate-y-0" : "opacity-0 transform -translate-y-2"
-              )}
-            >
-              <h4 className="text-sm text-emerald-500/80 font-medium">
-                {steps[activeStep].title}
-              </h4>
-              <p className="text-xs text-emerald-500/60 mt-0.5">
-                {steps[activeStep].description}
-              </p>
+          {/* Step description */}
+          {currentStep >= 0 && !showCompletion && (
+            <div className="h-12">
+              <div className="transition-all duration-300 opacity-100 transform translate-y-0">
+                <h4 className="text-sm text-emerald-500/80 font-medium">
+                  {STEPS[currentStep].title}
+                </h4>
+                <p className="text-xs text-emerald-500/60 mt-0.5">
+                  {STEPS[currentStep].description}
+                </p>
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
+        {/* Completion overlay */}
         <div className={cn(
           "absolute inset-0 flex flex-col items-center justify-center p-6 transition-all duration-500",
           showCompletion ? "opacity-100 scale-100" : "opacity-0 scale-95"
         )}>
-          <CompletionMessage />
+          <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center mb-3">
+            <CheckIcon />
+          </div>
           <p className="text-sm text-emerald-500/80 text-center leading-relaxed">
-            Your meeting brief is ready! We&apos;ve flagged 2 overlooked tasks and included the latest team updates in your report.
+            Your meeting brief is ready! We&apos;ve flagged 2 overlooked tasks and included the latest team updates.
           </p>
         </div>
       </div>
