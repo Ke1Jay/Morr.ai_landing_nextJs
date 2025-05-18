@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card"
 import { IntegrationsGrid } from "@/components/ui/integrations-grid"
 import { UnifiedSearch } from "@/components/ui/unified-search"
 import { WorkflowSteps } from "@/components/ui/workflow-steps"
+import { AnalyticsVisual } from "@/components/ui/analytics-visual"
 
 // Feature card props interface
 interface FeatureCardProps {
@@ -19,32 +20,6 @@ interface FeatureCardProps {
 const UnifiedSearchVisual = () => (
   <div className="relative w-full h-[180px]">
     <UnifiedSearch className="h-full" />
-  </div>
-)
-
-const AnalyticsVisual = () => (
-  <div className="relative w-full h-[180px] bg-[#0C1615] rounded-xl p-6 mb-6">
-    <div className="flex items-end justify-between h-[100px] px-2">
-      {[30, 45, 60, 75, 90].map((height, i) => (
-        <div 
-          key={i}
-          className={cn(
-            "w-4 bg-emerald-500/40 rounded-t-sm transition-all duration-500",
-            i === 4 ? "animate-pulse bg-emerald-500/60" : ""
-          )}
-          style={{ height: `${height}%` }}
-        />
-      ))}
-    </div>
-    <div className="absolute bottom-6 left-6 right-6 h-[1px] bg-emerald-900/50" />
-    {/* Time indicators */}
-    <div className="absolute bottom-2 left-6 right-6 flex justify-between">
-      <div className="w-3 h-3 rounded-full bg-emerald-900/30" />
-      <div className="w-3 h-3 rounded-full bg-emerald-900/30" />
-      <div className="w-3 h-3 rounded-full bg-emerald-900/30" />
-      <div className="w-3 h-3 rounded-full bg-emerald-900/30" />
-      <div className="w-3 h-3 rounded-full bg-emerald-900/30" />
-    </div>
   </div>
 )
 
