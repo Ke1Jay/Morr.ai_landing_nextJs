@@ -18,10 +18,10 @@ export default function LandingPage() {
       <WhatItDoesSection />
       <CoreFeaturesSection />
       <UseCasesSection />
-      <SecuritySection />
-      <ComingSoonSection />
+      {/* <SecuritySection /> */}
+      {/* <ComingSoonSection /> */}
       <CtaSection />
-      <TestimonialsSection />
+      {/* <TestimonialsSection /> */}
     </main>
   )
 }

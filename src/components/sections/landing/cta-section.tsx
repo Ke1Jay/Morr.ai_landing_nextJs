@@ -14,7 +14,7 @@ export function CtaSection() {
   return (
     <section className="w-full min-h-[80vh] flex items-center justify-center py-16 md:py-24">
       <div className="container px-4 md:px-6">
-        <div className="relative w-full max-w-full mx-auto rounded-[2.5rem] bg-black/40 backdrop-blur-xl border border-primary/10 overflow-hidden">
+        <div className="relative w-full max-w-7xl mx-auto rounded-[2.5rem] bg-black/40 backdrop-blur-xl border border-primary/10 overflow-hidden">
           <BackgroundEffect />
           
           <div className="relative px-6 py-16 md:px-12 md:py-20">

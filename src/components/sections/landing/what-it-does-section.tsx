@@ -114,7 +114,7 @@ export function WhatItDoesSection() {
     <section className="w-full min-h-[40vh] flex items-center justify-center bg-background pt-16 lg:pt-8 pb-24 md:pb-32 lg:pb-40">
       <div className="container px-4 md:px-6">
         {/* Main content container with glass effect */}
-        <div className="relative w-full max-w-full mx-auto rounded-[2.5rem] bg-black/40 backdrop-blur-xl border border-primary/10 overflow-hidden">
+        <div className="relative w-full max-w-7xl mx-auto rounded-[2.5rem] bg-black/40 backdrop-blur-xl border border-primary/10 overflow-hidden">
           <BackgroundEffect />
           
           <div className="relative px-6 py-20 md:px-12 md:py-24">

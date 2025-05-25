@@ -150,7 +150,7 @@ export function CoreFeaturesSection() {
         </div>
 
         {/* Features grid */}
-        <div className="mx-auto grid max-w-full xl:max-w-5xl items-start gap-8 sm:grid-cols-1 lg:grid-cols-2 pt-16">
+        <div className="mx-auto grid max-w-full xl:max-w-7xl items-start gap-8 sm:grid-cols-1 lg:grid-cols-2 pt-16">
           {FEATURES.map((feature) => (
             <FeatureCard
               key={feature.title}

@@ -74,7 +74,7 @@ const IconLoadingFallback = () => (
 
 export function HeroSection() {
   return (
-    <section className="relative w-full min-h-[90vh] flex items-center justify-center bg-background overflow-hidden">
+    <section className="relative w-full min-h-[90vh] max-w-7xl mx-auto flex items-center justify-center bg-background overflow-hidden">
       {/* Background gradient effect */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />

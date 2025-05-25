@@ -246,7 +246,7 @@ export function UseCasesSection() {
         </div>
 
         <div className={cn(
-          "mx-auto grid max-w-full xl:max-w-6xl",
+          "mx-auto grid max-w-full xl:max-w-7xl",
           "gap-6 sm:gap-8",
           "grid-cols-1 sm:grid-cols-2 lg:grid-cols-4",
           "pt-16"
