@@ -18,20 +18,26 @@ interface FeatureCardProps {
 
 // Visual components for each feature
 const UnifiedSearchVisual = () => (
-  <div className="relative w-full h-[180px]">
+  <div className="relative w-full h-[220px]">
     <UnifiedSearch className="h-full" />
   </div>
 )
 
 const WorkflowVisual = () => (
-  <div className="relative w-full h-[180px]">
+  <div className="relative w-full h-[220px]">
     <WorkflowSteps className="h-full" />
   </div>
 )
 
 const IntegrationsVisual = () => (
-  <div className="relative w-full h-[180px] mb-6">
+  <div className="relative w-full h-[220px]">
     <IntegrationsGrid />
+  </div>
+)
+
+const AnalyticsVisualStandard = () => (
+  <div className="relative w-full h-[220px]">
+    <AnalyticsVisual className="h-full" />
   </div>
 )
 
@@ -46,17 +52,19 @@ const FeatureCard = ({
 }: FeatureCardProps) => (
   <Card 
     className={cn(
-      "group relative grid gap-2 p-6 rounded-xl border border-primary/10",
+      "group relative flex flex-col p-6 rounded-xl border border-primary/10",
       "bg-black/40 backdrop-blur-xl hover:bg-black/50 transition-all duration-300",
-      "hover:border-primary/20",
+      "hover:border-primary/20 h-full", // Ensure all cards take full height
       className
     )}
   >
     {/* Visual element */}
-    {visual}
+    <div className="relative w-full mb-6">
+      {visual}
+    </div>
     
     {/* Content */}
-    <div className="relative z-10">
+    <div className="relative z-10 flex-1 flex flex-col">
       <div className="flex items-center gap-3 mb-4">
         <span className="text-2xl">{icon}</span>
         <h3 className="text-xl font-bold text-primary/90">
@@ -71,7 +79,7 @@ const FeatureCard = ({
       )}
       
       {bulletPoints && bulletPoints.length > 0 && (
-        <ul className="space-y-2">
+        <ul className="space-y-2 flex-1">
           {bulletPoints.map((point, index) => (
             <li key={index} className="flex items-start gap-2 text-muted-foreground/80">
               <span className="text-primary/60 text-sm mt-1">•</span>
@@ -103,12 +111,14 @@ const FEATURES = [
   {
     icon: "📊",
     title: "Real-Time Insights, Delivered Proactively",
+    description: "See how Morr.ai proactively delivers contextual insights, meeting briefs, and actionable intelligence before you even ask.",
     bulletPoints: [
       "Morr.ai delivers meeting briefs ahead of time",
       "Up-to-the-minute sales insights",
-      "Project status updates without asking"
+      "Project status updates without asking",
+      "Risk detection and opportunity alerts"
     ],
-    visual: <AnalyticsVisual />
+    visual: <AnalyticsVisualStandard />
   },
   {
     icon: "🤖",
@@ -150,7 +160,7 @@ export function CoreFeaturesSection() {
         </div>
 
         {/* Features grid */}
-        <div className="mx-auto grid max-w-full xl:max-w-7xl items-start gap-8 sm:grid-cols-1 lg:grid-cols-2 pt-16">
+        <div className="mx-auto grid max-w-full xl:max-w-7xl items-stretch gap-8 sm:grid-cols-1 lg:grid-cols-2 pt-16">
           {FEATURES.map((feature) => (
             <FeatureCard
               key={feature.title}

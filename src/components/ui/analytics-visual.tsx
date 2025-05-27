@@ -2,231 +2,403 @@
 
 import React, { useState, useEffect, useRef, useCallback, memo } from 'react'
 import { cn } from "@/lib/utils"
+import { useInView } from 'react-intersection-observer'
 
 interface AnalyticsVisualProps {
     className?: string
 }
 
-interface MetricCardProps {
-    label: string
-    value: string | number
-    change: {
-        value: number
-        isPositive: boolean
+interface InsightData {
+    readonly icon: string
+    readonly title: string
+    readonly description: string
+    readonly priority: 'high' | 'medium' | 'low'
+    readonly timestamp: string
+}
+
+interface MetricData {
+    readonly label: string
+    readonly value: string
+    readonly trend: 'up' | 'down' | 'neutral'
+    readonly change: string
+}
+
+// Constants moved to top level for better performance
+const ANIMATION_TIMING = {
+    duration: 800,
+    easing: 'cubic-bezier(0.34, 1.56, 0.64, 1)'
+} as const
+
+const CARD_DIMENSIONS = {
+    height: 92,
+    gap: 8
+} as const
+
+const INSIGHTS: readonly InsightData[] = [
+    {
+        icon: "🚨",
+        title: "Meeting Brief Ready",
+        description: "Acme Corp call in 15 min - 2 action items flagged",
+        priority: 'high',
+        timestamp: "2 min ago"
+    },
+    {
+        icon: "📈",
+        title: "Sales Momentum Alert",
+        description: "Pipeline velocity up 23% - 3 deals closing this week",
+        priority: 'medium',
+        timestamp: "5 min ago"
+    },
+    {
+        icon: "⚠️",
+        title: "Risk Detection",
+        description: "Customer sentiment dip detected for Enterprise tier",
+        priority: 'high',
+        timestamp: "8 min ago"
+    },
+    {
+        icon: "✅",
+        title: "Weekly Report Generated",
+        description: "Team performance summary ready for review",
+        priority: 'low',
+        timestamp: "12 min ago"
     }
-    animationDelay?: number
-    isVisible?: boolean
-}
+] as const
 
-function AnimatedNumberBase({ 
-    value, 
-    duration = 1000, 
-    isVisible = false 
-}: { 
-    value: number
-    duration?: number
-    isVisible?: boolean 
-}) {
-    const [displayValue, setDisplayValue] = useState<number>(0)
-    const animationRef = useRef<number | null>(null)
-    const startTimeRef = useRef<number | null>(null)
-    
-    useEffect(() => {
-        if (!isVisible) {
-            if (animationRef.current) {
-                cancelAnimationFrame(animationRef.current)
-                animationRef.current = null
-            }
-            setDisplayValue(0)
-            return
-        }
+const METRICS: readonly MetricData[] = [
+    { label: "Active Insights", value: "12", trend: 'up', change: "+3" },
+    { label: "Response Time", value: "1.2s", trend: 'down', change: "-0.3s" },
+    { label: "Accuracy", value: "94%", trend: 'up', change: "+2%" }
+] as const
 
-        // Reset start time when value changes
-        startTimeRef.current = Date.now()
-        const startValue = 0
-        
-        function updateValue() {
-            if (!startTimeRef.current) return
+const PRIORITY_STYLES = {
+    high: "border-red-500/30 bg-red-500/5",
+    medium: "border-yellow-500/30 bg-yellow-500/5", 
+    low: "border-emerald-500/30 bg-emerald-500/5"
+} as const
 
-            const elapsed = Date.now() - startTimeRef.current
-            
-            if (elapsed < duration) {
-                const progress = elapsed / duration
-                // Use easeOutQuad for smoother animation
-                const easeProgress = 1 - (1 - progress) * (1 - progress)
-                const nextValue = startValue + (value - startValue) * easeProgress
-                
-                setDisplayValue(nextValue)
-                animationRef.current = requestAnimationFrame(updateValue)
-            } else {
-                setDisplayValue(value)
-                animationRef.current = null
-            }
-        }
-        
-        animationRef.current = requestAnimationFrame(updateValue)
-        
-        return () => {
-            if (animationRef.current) {
-                cancelAnimationFrame(animationRef.current)
-                animationRef.current = null
-            }
-        }
-    }, [value, duration, isVisible])
+const PRIORITY_DOTS = {
+    high: "bg-red-500",
+    medium: "bg-yellow-500",
+    low: "bg-emerald-500"
+} as const
 
-    return <>{displayValue.toLocaleString(undefined, { maximumFractionDigits: 1 })}</>
-}
+const TREND_STYLES = {
+    up: "text-emerald-400",
+    down: "text-red-400",
+    neutral: "text-yellow-400"
+} as const
 
-const AnimatedNumber = memo(AnimatedNumberBase)
+const TREND_ICONS = {
+    up: "↗",
+    down: "↘",
+    neutral: "→"
+} as const
 
-function MetricCardBase({ 
-    label, 
-    value, 
-    change, 
-    animationDelay = 0, 
-    isVisible = false 
-}: MetricCardProps) {
-    const numericValue = typeof value === 'string' ? parseFloat(value.replace(/[^0-9.]/g, '')) : value
-    
+function InsightCard({ 
+    icon, 
+    title, 
+    description, 
+    priority, 
+    timestamp
+}: InsightData) {
     return (
         <div 
             className={cn(
-                "relative p-3 rounded-xl bg-[#1A1D1D] border border-emerald-500/10",
-                isVisible && "animate-in fade-in duration-300 fill-mode-forwards",
-                "hover:border-emerald-500/20 transition-colors duration-300"
+                "relative p-2.5 rounded-lg border transition-all duration-300 transform scale-[0.98]",
+                PRIORITY_STYLES[priority],
+                "hover:scale-100 cursor-pointer"
             )}
-            style={{ 
-                animationDelay: `${animationDelay}ms`,
-                opacity: isVisible ? undefined : 0,
-                transform: isVisible ? 'none' : 'translateY(10px)',
-                transition: 'opacity 300ms ease-out, transform 300ms ease-out'
-            }}
+            role="article"
+            aria-label={`${priority} priority insight: ${title}`}
         >
-            <div className="text-xs text-emerald-500/60 mb-1">{label}</div>
-            <div className="text-2xl font-semibold text-white/90 mb-1 leading-none">
-                {typeof value === 'string' && value.includes('%') ? (
-                    <><AnimatedNumber value={numericValue} isVisible={isVisible} />{value.includes('%') ? '%' : ''}</>
-                ) : (
-                    <AnimatedNumber value={numericValue} isVisible={isVisible} />
-                )}
+            <div className="flex items-start gap-2">
+                <span className="text-sm shrink-0 mt-0.5" aria-hidden="true">{icon}</span>
+                <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                        <h4 className="text-xs font-medium text-emerald-500/90 truncate">
+                            {title}
+                        </h4>
+                        <div 
+                            className={cn("w-1.5 h-1.5 rounded-full shrink-0", PRIORITY_DOTS[priority])} 
+                            aria-hidden="true"
+                        />
+                    </div>
+                    <p className="text-xs text-emerald-500/70 leading-relaxed line-clamp-2">
+                        {description}
+                    </p>
+                    <div className="text-[10px] text-emerald-500/50 mt-1">
+                        {timestamp}
+                    </div>
+                </div>
             </div>
-            <div className={cn(
-                "text-xs flex items-center gap-1",
-                change.isPositive ? "text-emerald-500" : "text-red-500"
-            )}>
-                {change.isPositive ? "↑" : "↓"} {Math.abs(change.value)}%
-            </div>
-            
-            <div className="absolute -bottom-0 -right-0 w-6 h-6 bg-gradient-to-br from-emerald-500/10 to-transparent rounded-tl-2xl" />
         </div>
     )
 }
 
-const MetricCard = memo(MetricCardBase)
+const MemoizedInsightCard = memo(InsightCard)
 
-const METRICS = [
-    {
-        label: "Sentiment Score",
-        value: "8.4",
-        change: { value: 2.1, isPositive: true }
-    },
-    {
-        label: "Health Score",
-        value: "92",
-        change: { value: 1.5, isPositive: true }
-    },
-    {
-        label: "Engagement",
-        value: "76%",
-        change: { value: 0.8, isPositive: false }
-    },
-    {
-        label: "Total Customers",
-        value: "1,240",
-        change: { value: 12, isPositive: true }
-    }
-] as const
+function MetricCard({ metric, index, isVisible }: { 
+    metric: MetricData
+    index: number
+    isVisible: boolean 
+}) {
+    return (
+        <div 
+            className="flex flex-col gap-1 px-2 py-1.5 rounded bg-emerald-900/20"
+            style={{ 
+                animationDelay: `${index * 100}ms`,
+                opacity: isVisible ? 1 : 0,
+                transform: isVisible ? 'none' : 'translateX(-10px)',
+                transition: `all ${ANIMATION_TIMING.duration}ms ${ANIMATION_TIMING.easing}`
+            }}
+            role="status"
+            aria-label={`${metric.label}: ${metric.value}`}
+        >
+            <div className="text-[9px] text-emerald-500/50 leading-none truncate">
+                {metric.label}
+            </div>
+            <div className="flex items-center justify-between gap-1">
+                <div className="text-xs font-semibold text-emerald-500/90 leading-none">
+                    {metric.value}
+                </div>
+                <div className={cn(
+                    "text-[9px] flex items-center gap-0.5 leading-none",
+                    TREND_STYLES[metric.trend]
+                )}>
+                    <span className="text-[7px]" aria-hidden="true">
+                        {TREND_ICONS[metric.trend]}
+                    </span>
+                    {metric.change}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+const MemoizedMetricCard = memo(MetricCard)
 
 export function AnalyticsVisual({ className }: AnalyticsVisualProps) {
-    const [showSecondPair, setShowSecondPair] = useState(false)
-    const [isVisible, setIsVisible] = useState(false)
-    const componentRef = useRef<HTMLDivElement | null>(null)
-    const intervalRef = useRef<number | null>(null)
+    const [visibleInsights, setVisibleInsights] = useState<number[]>([])
+    const [showMetrics, setShowMetrics] = useState(false)
+    const [scrollPosition, setScrollPosition] = useState(0)
+    
+    const metricsContainerRef = useRef<HTMLDivElement>(null)
+    const lastMetricRef = useRef<HTMLDivElement>(null)
+    const intervalRef = useRef<NodeJS.Timeout | null>(null)
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-    const startInterval = useCallback(() => {
-        // Clear any existing interval first
-        if (intervalRef.current) {
-            clearInterval(intervalRef.current)
-        }
-        intervalRef.current = window.setInterval(() => {
-            setShowSecondPair(prev => !prev)
-        }, 4000)
+    // Use intersection observer for visibility detection
+    const { ref: inViewRef, inView } = useInView({
+        threshold: 0.2,
+        rootMargin: '50px 0px',
+    })
+
+    // Calculate scroll amount based on last metric position
+    const calculateScrollAmount = useCallback(() => {
+        const container = metricsContainerRef.current
+        const lastMetric = lastMetricRef.current
+        if (!container || !lastMetric) return 0
+
+        const containerHeight = container.clientHeight
+        const lastMetricBottom = lastMetric.offsetTop + lastMetric.offsetHeight
+        const scrollNeeded = Math.max(0, lastMetricBottom - containerHeight)
+        
+        return scrollNeeded + 8 // Small offset for visibility
     }, [])
 
-    const cleanupInterval = useCallback(() => {
+    const cleanup = useCallback(() => {
         if (intervalRef.current) {
             clearInterval(intervalRef.current)
             intervalRef.current = null
         }
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current)
+            timeoutRef.current = null
+        }
+        setVisibleInsights([])
+        setScrollPosition(0)
     }, [])
 
-    useEffect(() => {
-        if (!componentRef.current) return
+    const startInsightCycle = useCallback(() => {
+        cleanup()
+        
+        // Show first insight immediately
+        setVisibleInsights([0])
+        setScrollPosition(0)
+        let currentIndex = 0
 
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach((entry) => {
-                    if (entry.isIntersecting) {
-                        setIsVisible(true)
-                        startInterval()
-                    } else {
-                        cleanupInterval()
-                        setIsVisible(false)
-                        setShowSecondPair(false)
-                    }
-                })
-            },
-            {
-                threshold: 0.2,
-                rootMargin: '50px 0px'
+        intervalRef.current = setInterval(() => {
+            currentIndex = (currentIndex + 1) % INSIGHTS.length
+            
+            if (currentIndex === 2) {
+                setTimeout(() => setScrollPosition(0), 200)
+            } else if (currentIndex === 1) {
+                setTimeout(() => setScrollPosition(1), 300)
             }
-        )
 
-        observer.observe(componentRef.current)
-        return () => {
-            observer.disconnect()
-            cleanupInterval()
+            setVisibleInsights(current => [currentIndex, ...current].slice(0, 2))
+        }, 4000)
+    }, [cleanup])
+
+    // Handle visibility changes
+    useEffect(() => {
+        if (inView) {
+            // Start metrics animation
+            setShowMetrics(true)
+            
+            // Start insight cycle with a delay
+            const timer = setTimeout(() => {
+                startInsightCycle()
+            }, 500)
+            
+            return () => clearTimeout(timer)
+        } else {
+            cleanup()
         }
-    }, [startInterval, cleanupInterval])
+    }, [inView, startInsightCycle, cleanup])
 
-    const currentMetrics = showSecondPair ? METRICS.slice(2, 4) : METRICS.slice(0, 2)
+    // Handle page visibility changes
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                cleanup()
+            } else if (inView) {
+                const timer = setTimeout(() => {
+                    startInsightCycle()
+                }, 500)
+                return () => clearTimeout(timer)
+            }
+        }
+
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange)
+            cleanup()
+        }
+    }, [inView, startInsightCycle, cleanup])
+
+    // Handle scroll animation for metrics
+    useEffect(() => {
+        const container = metricsContainerRef.current
+        if (!container) return
+
+        const scrollAmount = scrollPosition * calculateScrollAmount()
+        container.style.transform = `translateY(-${scrollAmount}px)`
+    }, [scrollPosition, calculateScrollAmount])
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return cleanup
+    }, [cleanup])
 
     return (
         <div 
-            ref={componentRef}
+            ref={inViewRef}
             className={cn(
-                "relative w-full h-[180px] bg-[#0C1615] rounded-xl p-4",
+                "relative w-full bg-[#0C1615] rounded-xl overflow-hidden min-h-[180px]",
                 className
             )}
+            role="region"
+            aria-label="Analytics Dashboard"
         >
-            <div className={cn(
-                "flex items-center gap-2 mb-3",
-                "transition-opacity duration-300",
-                isVisible ? "opacity-100" : "opacity-0"
-            )}>
-                <div className="text-lg">😕</div>
-                <h3 className="text-base font-semibold text-emerald-500/90">Customer Sentiment</h3>
-            </div>
+            <div className="absolute inset-4 bg-[#070C0B] rounded-lg p-4 flex flex-col h-[calc(100%-2rem)]">
+                {/* Header */}
+                <div className={cn(
+                    "flex items-center justify-between mb-4 transition-opacity duration-300",
+                    inView ? "opacity-100" : "opacity-0"
+                )}>
+                    <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <h3 className="text-sm font-medium text-emerald-500/90">
+                            Live Insights Dashboard
+                        </h3>
+                    </div>
+                    <div className="text-xs text-emerald-500/60">Real-time</div>
+                </div>
 
-            <div className="grid grid-cols-2 gap-3">
-                {currentMetrics.map((metric, index) => (
-                    <MetricCard 
-                        key={metric.label}
-                        {...metric}
-                        animationDelay={index * 100}
-                        isVisible={isVisible}
-                    />
-                ))}
+                {/* Content */}
+                <div className="flex-1 flex gap-4 overflow-hidden">
+                    {/* Metrics */}
+                    <div className={cn(
+                        "w-1/5 overflow-hidden transition-all duration-300",
+                        showMetrics ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4"
+                    )}>
+                        <div 
+                            ref={metricsContainerRef}
+                            className="flex flex-col gap-2 transition-all"
+                            style={{ 
+                                transition: `transform ${ANIMATION_TIMING.duration}ms ${ANIMATION_TIMING.easing}`
+                            }}
+                        >
+                            {METRICS.map((metric, index) => (
+                                <div
+                                    key={metric.label}
+                                    ref={index === METRICS.length - 1 ? lastMetricRef : null}
+                                >
+                                    <MemoizedMetricCard
+                                        metric={metric}
+                                        index={index}
+                                        isVisible={showMetrics}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Insights */}
+                    <div className="flex-1 overflow-hidden">
+                        <div 
+                            className="flex flex-col gap-2 relative" 
+                            style={{ 
+                                height: `${(visibleInsights.length * CARD_DIMENSIONS.height) + 
+                                    ((visibleInsights.length - 1) * CARD_DIMENSIONS.gap)}px`,
+                                minHeight: '100px',
+                                transition: `height ${ANIMATION_TIMING.duration}ms ${ANIMATION_TIMING.easing}`
+                            }}
+                        >
+                            {visibleInsights.map((insightIndex, displayIndex) => {
+                                const yPosition = displayIndex * CARD_DIMENSIONS.height + 
+                                    (displayIndex * CARD_DIMENSIONS.gap)
+                                
+                                return (
+                                    <div
+                                        key={`insight-${insightIndex}-${displayIndex}`}
+                                        className="absolute w-full"
+                                        style={{
+                                            top: 0,
+                                            transform: `translateY(${yPosition}px)`,
+                                            opacity: 1,
+                                            transition: `transform ${ANIMATION_TIMING.duration}ms ${ANIMATION_TIMING.easing}, opacity ${ANIMATION_TIMING.duration}ms ease-in-out`,
+                                            ...(displayIndex === 0 && {
+                                                animation: `slideInFromTop ${ANIMATION_TIMING.duration}ms ${ANIMATION_TIMING.easing}`
+                                            })
+                                        }}
+                                    >
+                                        <style jsx>{`
+                                            @keyframes slideInFromTop {
+                                                0% {
+                                                    transform: translateY(-100%);
+                                                    opacity: 0;
+                                                }
+                                                60% {
+                                                    opacity: 1;
+                                                }
+                                                100% {
+                                                    transform: translateY(0);
+                                                    opacity: 1;
+                                                }
+                                            }
+                                        `}</style>
+                                        <MemoizedInsightCard
+                                            {...INSIGHTS[insightIndex]}
+                                        />
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     )
