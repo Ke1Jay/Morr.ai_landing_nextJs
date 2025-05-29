@@ -88,7 +88,7 @@ const StepIndicator = memo(({
   <div className="relative" role="listitem">
     <div 
       className={cn(
-        "w-10 h-10 rounded-xl flex items-center justify-center transition-colors duration-300",
+        "w-12 h-12 rounded-xl flex items-center justify-center transition-colors duration-300",
         isCompleted || isActive ? "bg-emerald-500/20" : "bg-emerald-900/30"
       )}
       aria-label={`Step ${stepNumber + 1}${isCompleted ? ' (completed)' : isActive ? ' (in progress)' : ''}`}
@@ -112,7 +112,7 @@ StepIndicator.displayName = 'StepIndicator'
 const ProgressLine = memo(({ progress }: { progress: number }) => (
   <div className="flex-1 mx-2">
     <div 
-      className="h-[2px] bg-emerald-900/30 relative overflow-hidden"
+      className="h-[3px] bg-emerald-900/30 relative overflow-hidden"
       role="progressbar"
       aria-valuemin={0}
       aria-valuemax={100}
@@ -134,10 +134,10 @@ const StepDescription = memo(({ step }: { step: Step }) => (
     role="status"
     aria-live="polite"
   >
-    <h4 className="text-base font-semibold text-emerald-500/90 mb-2">
+    <h4 className="text-lg font-semibold text-emerald-500/90 mb-2">
       {step.title}
     </h4>
-    <p className="text-sm text-emerald-500/60 max-w-md mx-auto">
+    <p className="text-md text-emerald-500/60 max-w-md mx-auto">
       {step.description}
     </p>
   </div>
