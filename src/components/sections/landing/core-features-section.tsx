@@ -15,7 +15,7 @@ interface FeatureCardProps {
   Icon: React.ComponentType<{ size?: number; className?: string }>
   title: string
   description?: string
-  bulletPoints?: string[]
+  bulletPoints?: readonly string[]
   className?: string
   visual: React.ReactNode
 }
@@ -103,11 +103,6 @@ const FeatureCard = React.memo(({
       )}
     </div>
 
-    {/* Decorative corner accent */}
-    <div 
-      className="absolute -bottom-0 -right-0 w-8 h-8 bg-gradient-to-br from-primary/20 to-transparent rounded-tl-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
-      aria-hidden="true"
-    />
   </Card>
 ))
 
@@ -123,7 +118,7 @@ const FEATURES = [
       "Summarize Q2 product updates",
       "What did John say about pricing last week?",
       "What's the latest on the Acme deal?"
-    ] as string[],
+    ],
     visual: <UnifiedSearchVisual />
   },
   {
