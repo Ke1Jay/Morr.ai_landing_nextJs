@@ -15,6 +15,9 @@ const config: Config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["var(--font-dm-sans)", "sans-serif"],
+      },
       keyframes: {
         orbit: {
           '0%': { transform: 'rotate(0deg) translateX(140px) rotate(0deg)' },
