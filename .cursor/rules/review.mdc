@@ -1,0 +1,86 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+
+# Review of Section Flow and Potential Improvements
+
+## Hero Section Enhancements
+
+The hero section effectively establishes the main value proposition but could be better aligned with the downstream sections:
+
+1. **Value Proposition Alignment**
+   - Consider refining the hero subtitle to more explicitly connect to the four key outcomes featured in the AI Outcomes section
+   - The current "AI that works before you ask" is excellent, but could be enhanced with a subtle reference to the outcomes
+
+2. **Visual Transition**
+   - The OrbitVisual component creates a distinctive look, but consider adding subtle visual elements that foreshadow the outcome-based approach in the next section
+   - Perhaps incorporate small visual hints of the four outcome categories that will be expanded upon
+
+3. **CTA Refinement**
+   - The three CTAs (Early Access, Demo, Waitlist) could be more strategically aligned with different user journeys
+   - Consider prioritizing one primary action and making the others secondary/tertiary
+
+## AI Outcomes Section Refinements
+
+The AI Outcomes section is strong but could benefit from these adjustments:
+
+1. **Header Enhancement**
+   - The "Proactive AI" label could be more specific: "AI-Powered Workflows" or "Proactive AI Solutions"
+   - The subtitle "From meeting prep to deal insights..." repeats language from the hero section - consider differentiating it
+
+2. **Visual Storytelling**
+   - The abstract visualizations work well but could be slightly more representative of the specific outcome
+   - Consider using subtle animations on scroll to emphasize the temporal journey nature of each outcome
+
+3. **Role Tags Enhancement**
+   - The role tags could be visually connected to create a sense of "everyone benefits"
+   - Consider adding a subtle interaction where hovering on a role tag highlights related benefits in the journey points
+
+4. **Connection to Features**
+   - Add subtle visual or textual connections that hint at which core features (from the next section) power each outcome
+   - This creates a narrative thread between sections
+
+## Core Features Section Improvements
+
+To better align with the preceding sections:
+
+1. **Header Adjustment**
+   - Modify the "Core Features" messaging to explicitly connect back to the outcomes
+   - Perhaps: "Powerful Features Behind the Outcomes" or "Technology That Delivers Results"
+
+2. **Feature-to-Outcome Mapping**
+   - Add subtle visual cues that connect each feature back to the outcomes it enables
+   - For example, small icons or color coding that matches the outcome cards
+
+3. **Visual Consistency**
+   - Ensure the visual style of feature cards complements the outcome cards while maintaining distinction
+   - The current feature cards could adopt some of the visual elements from the outcome cards for cohesion
+
+4. **Content Distinction**
+   - Ensure feature descriptions focus on capabilities while outcome descriptions focus on benefits
+   - Refine language to avoid repetition between sections
+
+## Cross-Section Improvements
+
+For better overall flow and cohesion:
+
+1. **Consistent Visual Language**
+   - Adopt consistent use of icons, colors, and visual treatments across all three sections
+   - Create a visual hierarchy that guides users naturally from high-level value to specific benefits to enabling features
+
+2. **Scroll Behavior**
+   - Consider subtle scroll animations that create a sense of connected narrative
+   - Elements could transition in ways that emphasize the relationship between sections
+
+3. **Unified Messaging Framework**
+   - Ensure terminology is consistent across all sections (e.g., if you call it "prep work" in one section, use the same term elsewhere)
+   - Create a clear progression of messaging from problem/solution to benefits to capabilities
+
+4. **Mobile Optimization**
+   - Review how the three sections stack and transition on mobile
+   - Ensure the narrative flow remains clear when cards and elements are viewed in a single column
+
+These refinements would enhance the already strong foundation by creating a more cohesive, flowing experience that guides users naturally through your value proposition.
+
