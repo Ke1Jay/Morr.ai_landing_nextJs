@@ -2,6 +2,10 @@ import React from 'react'
 import { cn } from "@/lib/utils"
 import { Card } from "@/components/ui/card"
 import { Clock, BarChart3, Workflow, Users } from "lucide-react"
+import { MeetingBriefVisual } from "@/components/ui/meeting-brief-visual"
+import { OutcomesAnalyticsVisual } from "@/components/ui/outcomes-analytics-visual"
+import { AutomationWorkflowVisual } from "@/components/ui/automation-workflow-visual"
+import { RelationshipNetworkVisual } from "@/components/ui/relationship-network-visual"
 
 // Types for our component props
 interface IconProps {
@@ -28,73 +32,6 @@ interface OutcomeCardProps {
     visualElement: React.ReactNode
     className?: string
 }
-
-// Visual elements for each outcome card
-const MeetingBriefVisual = () => (
-    <div className="relative w-full h-28 bg-gradient-to-br from-primary/5 to-transparent rounded-lg flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37,99,75,0.1)_0%,transparent_70%)]" />
-        <div className="absolute top-4 left-4 w-10 h-10 rounded-full bg-primary/10 animate-pulse" />
-        <div className="absolute top-8 left-20 w-[120px] h-3 rounded-full bg-primary/10" />
-        <div className="absolute top-16 left-20 w-[80px] h-3 rounded-full bg-primary/10" />
-        <div className="absolute top-4 right-4 w-12 h-12 rounded-lg bg-primary/5 flex items-center justify-center">
-            <div className="w-6 h-6 rounded-full bg-primary/10" />
-        </div>
-    </div>
-)
-
-const AnalyticsVisual = () => (
-    <div className="relative w-full h-28 bg-gradient-to-br from-primary/5 to-transparent rounded-lg flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37,99,75,0.1)_0%,transparent_70%)]" />
-        <div className="grid grid-cols-3 gap-2 px-4 w-full">
-            <div className="h-16 bg-primary/5 rounded-md flex flex-col items-center justify-center">
-                <div className="w-8 h-8 rounded-full bg-primary/10 mb-2" />
-                <div className="w-12 h-2 bg-primary/10 rounded-full" />
-            </div>
-            <div className="h-16 bg-primary/10 rounded-md flex flex-col items-center justify-center">
-                <div className="w-8 h-8 rounded-full bg-primary/20 mb-2" />
-                <div className="w-12 h-2 bg-primary/20 rounded-full" />
-            </div>
-            <div className="h-16 bg-primary/5 rounded-md flex flex-col items-center justify-center">
-                <div className="w-8 h-8 rounded-full bg-primary/10 mb-2" />
-                <div className="w-12 h-2 bg-primary/10 rounded-full" />
-            </div>
-        </div>
-    </div>
-)
-
-const AutomationVisual = () => (
-    <div className="relative w-full h-28 bg-gradient-to-br from-primary/5 to-transparent rounded-lg flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37,99,75,0.1)_0%,transparent_70%)]" />
-        <div className="flex items-center justify-between px-6 w-full">
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <div className="w-6 h-6 rounded-md bg-primary/20" />
-            </div>
-            <div className="w-20 h-[1px] bg-primary/20" />
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <div className="w-6 h-6 rounded-md bg-primary/20" />
-            </div>
-            <div className="w-20 h-[1px] bg-primary/20" />
-            <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                <div className="w-6 h-6 rounded-md bg-primary/20" />
-            </div>
-        </div>
-    </div>
-)
-
-const RelationshipVisual = () => (
-    <div className="relative w-full h-28 bg-gradient-to-br from-primary/5 to-transparent rounded-lg flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37,99,75,0.1)_0%,transparent_70%)]" />
-        <div className="flex gap-3 items-center">
-            <div className="w-12 h-12 rounded-full bg-primary/10" />
-            <div className="w-[1px] h-6 bg-primary/20" />
-            <div className="w-16 h-16 rounded-full bg-primary/15 flex items-center justify-center">
-                <div className="w-10 h-10 rounded-full bg-primary/10" />
-            </div>
-            <div className="w-[1px] h-6 bg-primary/20" />
-            <div className="w-12 h-12 rounded-full bg-primary/10" />
-        </div>
-    </div>
-)
 
 // Outcome card component
 function OutcomeCard({
@@ -248,7 +185,7 @@ const OUTCOMES = [
             { name: "Operations" },
             { name: "Executives" }
         ],
-        visualElement: <AnalyticsVisual />
+        visualElement: <OutcomesAnalyticsVisual />
     },
     {
         icon: Workflow,
@@ -273,7 +210,7 @@ const OUTCOMES = [
             { name: "Sales Leaders" },
             { name: "Admins" }
         ],
-        visualElement: <AutomationVisual />
+        visualElement: <AutomationWorkflowVisual />
     },
     {
         icon: Users,
@@ -298,22 +235,19 @@ const OUTCOMES = [
             { name: "Account Execs" },
             { name: "Success" }
         ],
-        visualElement: <RelationshipVisual />
+        visualElement: <RelationshipNetworkVisual />
     }
 ]
 
 export function AiOutcomesSection() {
     return (
-        <section className="w-full py-24 lg:py-32 bg-background relative overflow-hidden">
-            {/* Background effects */}
-            <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(37,99,75,0.1)_0%,transparent_65%)]" />
-                <div className="absolute inset-0 bg-[linear-gradient(rgba(37,99,75,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(37,99,75,0.05)_1px,transparent_1px)] bg-[size:32px_32px]" />
-            </div>
-
+        <section 
+            className="w-full min-h-[40vh] flex items-center justify-center bg-background pt-16 lg:pt-8 pb-24 md:pb-32 lg:pb-40"
+            aria-labelledby="ai-outcomes-heading"
+        >
             <div className="container px-4 md:px-6">
                 {/* Header */}
-                <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12 md:mb-16">
+                <div className="flex flex-col items-center justify-center space-y-4 text-center">
                     <div className="space-y-2 max-w-[900px]">
                         <div className={cn(
                             "inline-flex items-center",
@@ -325,7 +259,10 @@ export function AiOutcomesSection() {
                             <div className="h-2 w-2 rounded-full bg-primary animate-pulse mr-2" />
                             <span>Proactive AI</span>
                         </div>
-                        <h2 className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-center mx-auto">
+                        <h2 
+                            id="ai-outcomes-heading" 
+                            className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-center mx-auto"
+                        >
                             AI-Powered Outcomes for <span className="text-primary">Every Sales Role</span>
                         </h2>
                         <p className="mt-4 text-base sm:text-lg text-muted-foreground/80 text-center mx-auto max-w-[600px]">
@@ -339,7 +276,8 @@ export function AiOutcomesSection() {
                     "grid",
                     "gap-6 sm:gap-8",
                     "grid-cols-1 md:grid-cols-2",
-                    "max-w-7xl mx-auto"
+                    "max-w-7xl mx-auto",
+                    "pt-16"
                 )}>
                     {OUTCOMES.map((outcome, index) => (
                         <OutcomeCard key={index} {...outcome} />
