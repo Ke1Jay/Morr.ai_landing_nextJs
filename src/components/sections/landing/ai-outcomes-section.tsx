@@ -189,26 +189,26 @@ const OUTCOMES = [
     },
     {
         icon: Workflow,
-        title: "Eliminate Manual Work",
-        description: "Automate reporting, tracking and analysis across all your tools and teams.",
+        title: "Know Everything, Forget Nothing",
+        description: "Tap into your organization's collective wisdom. Access institutional knowledge, past decisions, and cross-team insights that would otherwise be lost.",
         journeyPoints: [
             {
-                timing: "Weekly",
-                description: "Reports generated and distributed automatically"
+                timing: "Onboarding",
+                description: "New hires instantly access years of project decisions and context"
             },
             {
-                timing: "Monthly",
-                description: "Pipeline analysis and forecasting without lifting a finger"
+                timing: "Planning",
+                description: "Surface how other teams solved similar challenges before"
             },
             {
-                timing: "Anytime",
-                description: "Real-time tracking of all sales activities across tools"
+                timing: "Strategy",
+                description: "Historical patterns and outcomes inform new initiatives"
             }
         ],
         roles: [
-            { name: "Operations" },
-            { name: "Sales Leaders" },
-            { name: "Admins" }
+            { name: "Leadership" },
+            { name: "New Hires" },
+            { name: "Project Managers" }
         ],
         visualElement: <AutomationWorkflowVisual />
     },
