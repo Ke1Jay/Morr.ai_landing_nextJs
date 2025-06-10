@@ -90,7 +90,7 @@ export default function PricingPage() {
         if (teamCount <= 5) return plans[0]; // Base
         if (teamCount <= 20) return plans[1]; // Plus
         return plans[2]; // Premium
-    }, [teamCount]);
+    }, [teamCount, plans]);
 
     return (
         <div className="w-full min-h-[90vh] flex items-center justify-center bg-background relative overflow-hidden">
