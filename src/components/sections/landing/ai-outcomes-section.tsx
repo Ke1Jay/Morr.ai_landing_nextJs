@@ -263,7 +263,7 @@ export function AiOutcomesSection() {
                             id="ai-outcomes-heading" 
                             className="text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl text-center mx-auto"
                         >
-                            AI-Powered Outcomes for <span className="text-primary">Every Sales Role</span>
+                            AI-Powered Outcomes for <span className="text-primary"><br />Every Sales Role</span>
                         </h2>
                         <p className="mt-4 text-base sm:text-lg text-muted-foreground/80 text-center mx-auto max-w-[600px]">
                             From meeting prep to deal insights, Morr.ai helps teams achieve better results with less effort through AI that works before you ask.
