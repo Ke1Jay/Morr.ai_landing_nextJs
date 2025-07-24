@@ -1,13 +1,28 @@
 import React from 'react'
+import dynamic from 'next/dynamic'
 import { cn } from "@/lib/utils"
 import { Card } from "@/components/ui/card"
 import { Clock, BarChart3, Workflow, Users } from "lucide-react"
-import { MeetingBriefVisual } from "@/components/ui/meeting-brief-visual"
-import { OutcomesAnalyticsVisual } from "@/components/ui/outcomes-analytics-visual"
-import { AutomationWorkflowVisual } from "@/components/ui/automation-workflow-visual"
-import { RelationshipNetworkVisual } from "@/components/ui/relationship-network-visual"
 
-// Types for our component props
+// Lazy load visual components for better performance
+const MeetingBriefVisual = dynamic(() => 
+    import('@/components/ui/meeting-brief-visual').then(mod => ({ default: mod.MeetingBriefVisual })), 
+    { ssr: true }
+)
+const OutcomesAnalyticsVisual = dynamic(() => 
+    import('@/components/ui/outcomes-analytics-visual').then(mod => ({ default: mod.OutcomesAnalyticsVisual })), 
+    { ssr: true }
+)
+const AutomationWorkflowVisual = dynamic(() => 
+    import('@/components/ui/automation-workflow-visual').then(mod => ({ default: mod.AutomationWorkflowVisual })), 
+    { ssr: true }
+)
+const RelationshipNetworkVisual = dynamic(() => 
+    import('@/components/ui/relationship-network-visual').then(mod => ({ default: mod.RelationshipNetworkVisual })), 
+    { ssr: true }
+)
+
+// Component interfaces
 interface IconProps {
     className?: string
     size?: number
@@ -31,6 +46,16 @@ interface OutcomeCardProps {
     roles: RoleTag[]
     visualElement: React.ReactNode
     className?: string
+}
+
+interface OutcomeData {
+    id: string
+    icon: React.ComponentType<IconProps>
+    title: string
+    description: string
+    journeyPoints: JourneyPoint[]
+    roles: RoleTag[]
+    visualElement: React.ReactNode
 }
 
 // Outcome card component
@@ -85,7 +110,7 @@ function OutcomeCard({
             <div className="space-y-3 mb-6">
                 {journeyPoints.map((point, index) => (
                     <div
-                        key={index}
+                        key={`${point.timing}-${index}`}
                         className={cn(
                             "flex items-start gap-2 group-hover:transform group-hover:translate-x-1",
                             "transition-transform duration-300 ease-out",
@@ -108,7 +133,7 @@ function OutcomeCard({
             <div className="mt-auto flex flex-wrap gap-2">
                 {roles.map((role, index) => (
                     <span
-                        key={index}
+                        key={`${role.name}-${index}`}
                         className={cn(
                             "text-xs px-2 py-1 rounded-full",
                             "bg-black/30 text-muted-foreground/60 border border-primary/10",
@@ -135,9 +160,10 @@ function OutcomeCard({
     )
 }
 
-// Data for our outcome cards
-const OUTCOMES = [
+// Static content data
+const OUTCOMES: OutcomeData[] = [
     {
+        id: "eliminate-prep-work",
         icon: Clock,
         title: "Eliminate Prep Work",
         description: "Focus on selling while AI handles the operational heavy lifting before you even ask.",
@@ -163,6 +189,7 @@ const OUTCOMES = [
         visualElement: <MeetingBriefVisual />
     },
     {
+        id: "make-smarter-decisions",
         icon: BarChart3,
         title: "Make Smarter Decisions",
         description: "Access real-time analytics that highlight risks and opportunities across your entire pipeline.",
@@ -188,6 +215,7 @@ const OUTCOMES = [
         visualElement: <OutcomesAnalyticsVisual />
     },
     {
+        id: "know-everything-forget-nothing",
         icon: Workflow,
         title: "Know Everything, Forget Nothing",
         description: "Tap into your organization's collective wisdom. Access institutional knowledge, past decisions, and cross-team insights that would otherwise be lost.",
@@ -213,6 +241,7 @@ const OUTCOMES = [
         visualElement: <AutomationWorkflowVisual />
     },
     {
+        id: "focus-on-what-matters",
         icon: Users,
         title: "Focus on What Matters",
         description: "Let AI handle research and follow-ups while you focus on building client relationships.",
@@ -279,11 +308,14 @@ export function AiOutcomesSection() {
                     "max-w-7xl mx-auto",
                     "pt-16"
                 )}>
-                    {OUTCOMES.map((outcome, index) => (
-                        <OutcomeCard key={index} {...outcome} />
+                    {OUTCOMES.map((outcome) => (
+                        <OutcomeCard key={outcome.id} {...outcome} />
                     ))}
                 </div>
             </div>
         </section>
     )
-} 
+}
+
+// Export interfaces for potential reuse
+export type { OutcomeCardProps, JourneyPoint, RoleTag, OutcomeData } 

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/lib/utils";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 
@@ -20,10 +19,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning className={dmSans.variable}>
       <body
-        className={cn(
-          "min-h-screen bg-background font-sans antialiased flex flex-col",
-          dmSans.className
-        )}
+        className="min-h-screen bg-background font-sans antialiased flex flex-col"
       >
         <Header />
         <div className="flex-grow">{children}</div>
