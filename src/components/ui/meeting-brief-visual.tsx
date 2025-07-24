@@ -3,30 +3,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { cn } from "@/lib/utils"
 import { useInView } from 'react-intersection-observer'
-import MorraiLogo from "@/components/icons/morr-ai/morrai-logo"
-
-interface Source {
-    id: string
-    name: string
-    icon: React.ReactNode
-    type: 'pipedrive' | 'morrai' | 'calendar' | 'email' | 'slack'
-}
-
-interface Meeting {
-    id: string
-    time: string
-    title: string
-    isInternal: boolean
-    client?: string
-    historicContext: string
-    keyPoints: string[]
-    sources: Source[]
-    duration: number // in minutes
-}
-
-interface MeetingBriefVisualProps {
-    className?: string
-}
 
 // Animation constants
 const ANIMATION_CONSTANTS = {
@@ -35,46 +11,25 @@ const ANIMATION_CONSTANTS = {
         context: 30,
         keyPoints: 20,
     },
-    SOURCE_REVEAL_DELAY: 200,
-    TRANSITION_DURATION: 500,
-    SCROLL_THRESHOLD: 20, // px from bottom to trigger scroll
 } as const
 
-// Icon components
-const PipedriveIcon: React.FC = () => (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M12 16L16 12L12 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M8 12H16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-)
+// Interfaces
+interface Meeting {
+    id: string
+    time: string
+    title: string
+    isInternal: boolean
+    client?: string
+    historicContext: string
+    keyPoints: string[]
+    endTime: string
+}
 
-const CalendarIcon: React.FC = () => (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="2"/>
-        <path d="M3 10H21" stroke="currentColor" strokeWidth="2"/>
-        <path d="M8 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-        <path d="M16 2V6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-    </svg>
-)
+interface MeetingBriefVisualProps {
+    className?: string
+}
 
-const SlackIcon: React.FC = () => (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M14.5 10C13.67 10 13 9.33 13 8.5V3.5C13 2.67 13.67 2 14.5 2C15.33 2 16 2.67 16 3.5V8.5C16 9.33 15.33 10 14.5 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M20.5 10H14.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M9.5 14C10.33 14 11 14.67 11 15.5V20.5C11 21.33 10.33 22 9.5 22C8.67 22 8 21.33 8 20.5V15.5C8 14.67 8.67 14 9.5 14Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-        <path d="M3.5 14H9.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-    </svg>
-)
-
-const EmailIcon: React.FC = () => (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" strokeWidth="2"/>
-        <path d="M2 8L12 14L22 8" stroke="currentColor" strokeWidth="2"/>
-    </svg>
-)
-
-// Complete example meetings data
+// Meeting data
 const EXAMPLE_MEETINGS: Meeting[] = [
     {
         id: '1',
@@ -84,16 +39,11 @@ const EXAMPLE_MEETINGS: Meeting[] = [
         client: 'TechCorp Solutions',
         historicContext: 'Previous demo focused on AI capabilities. Team showed high interest in automation features.',
         keyPoints: [
-            'Demo new workflow automation',
-            'Address security questions from last call',
-            'Discuss enterprise pricing options'
+            'Show automated invoice processing (saves 40hrs/week)',
+            'Confirm SOC2 compliance covers their banking reqs',
+            'Present 3-tier pricing: $50/100/200 per user/month'
         ],
-        sources: [
-            { id: '1', name: 'PipeDrive', icon: <PipedriveIcon />, type: 'pipedrive' },
-            { id: '2', name: 'Morr.ai', icon: <MorraiLogo className="w-3 h-3" />, type: 'morrai' },
-            { id: '3', name: 'Calendar', icon: <CalendarIcon />, type: 'calendar' }
-        ],
-        duration: 60
+        endTime: '10:00'
     },
     {
         id: '2',
@@ -102,15 +52,11 @@ const EXAMPLE_MEETINGS: Meeting[] = [
         isInternal: true,
         historicContext: 'Sprint planning completed yesterday. New feature rollout starting this week.',
         keyPoints: [
-            'Review sprint goals',
-            'Discuss blockers',
-            'Update on client feedback'
+            'Sprint goal: Complete user dashboard by Friday',
+            'Blocker: API rate limits affecting data sync',
+            'Client feedback: Need dark mode by next release'
         ],
-        sources: [
-            { id: '1', name: 'Slack', icon: <SlackIcon />, type: 'slack' },
-            { id: '2', name: 'Calendar', icon: <CalendarIcon />, type: 'calendar' }
-        ],
-        duration: 30
+        endTime: '11:00'
     },
     {
         id: '3',
@@ -120,16 +66,11 @@ const EXAMPLE_MEETINGS: Meeting[] = [
         client: 'DataFlow Inc',
         historicContext: 'Currently using legacy system. Need seamless transition to our platform within 2 months.',
         keyPoints: [
-            'Review integration timeline',
-            'Discuss data migration strategy',
-            'Set up weekly checkpoints'
+            'Timeline: Migration starts Jan 15, go-live March 1',
+            'Data strategy: Parallel run for 2 weeks minimum',
+            'Weekly calls: Tuesdays 2PM with tech & business teams'
         ],
-        sources: [
-            { id: '1', name: 'PipeDrive', icon: <PipedriveIcon />, type: 'pipedrive' },
-            { id: '2', name: 'Email', icon: <EmailIcon />, type: 'email' },
-            { id: '3', name: 'Morr.ai', icon: <MorraiLogo className="w-3 h-3" />, type: 'morrai' }
-        ],
-        duration: 45
+        endTime: '13:45'
     },
     {
         id: '4',
@@ -139,16 +80,11 @@ const EXAMPLE_MEETINGS: Meeting[] = [
         client: 'InnovateTech',
         historicContext: 'Strong Q1 performance. Looking to expand usage across more teams.',
         keyPoints: [
-            'Present Q1 success metrics',
-            'Propose expansion plan',
-            'Schedule team training sessions'
+            'Q1 results: 45% efficiency gain, 99.2% uptime',
+            'Expansion: Add 50 more users across sales & support',
+            'Training: 3 sessions next week for new departments'
         ],
-        sources: [
-            { id: '1', name: 'PipeDrive', icon: <PipedriveIcon />, type: 'pipedrive' },
-            { id: '2', name: 'Morr.ai', icon: <MorraiLogo className="w-3 h-3" />, type: 'morrai' },
-            { id: '3', name: 'Email', icon: <EmailIcon />, type: 'email' }
-        ],
-        duration: 90
+        endTime: '17:00'
     },
     {
         id: '5',
@@ -158,51 +94,105 @@ const EXAMPLE_MEETINGS: Meeting[] = [
         client: 'SecureBank Global',
         historicContext: 'Completed initial security assessment. Addressing final compliance requirements.',
         keyPoints: [
-            'Review security audit results',
-            'Present compliance documentation',
-            'Discuss implementation timeline'
+            'Audit passed: 2 minor issues fixed, report ready',
+            'SOC2 Type II cert delivered, covers all requirements',
+            'Go-live: Security features active by end of week'
         ],
-        sources: [
-            { id: '1', name: 'PipeDrive', icon: <PipedriveIcon />, type: 'pipedrive' },
-            { id: '2', name: 'Morr.ai', icon: <MorraiLogo className="w-3 h-3" />, type: 'morrai' },
-            { id: '3', name: 'Calendar', icon: <CalendarIcon />, type: 'calendar' }
-        ],
-        duration: 60
+        endTime: '18:00'
     }
 ]
 
-// Helper function to calculate end time
-function calculateEndTime(startTime: string, durationMinutes: number): string {
-    const [hours, minutes] = startTime.split(':').map(Number)
-    const totalMinutes = hours * 60 + minutes + durationMinutes
-    const endHours = Math.floor(totalMinutes / 60)
-    const endMinutes = totalMinutes % 60
-    return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`
-}
+const MEETING_HEIGHT = 90
 
 export function MeetingBriefVisual({ className }: MeetingBriefVisualProps) {
     const [currentMeetingIndex, setCurrentMeetingIndex] = useState(0)
     const [displayedContext, setDisplayedContext] = useState("")
     const [displayedKeyPoints, setDisplayedKeyPoints] = useState<string[]>([])
-    const [visibleSources, setVisibleSources] = useState(0)
-    const [scrollOffset, setScrollOffset] = useState(0)
+    const [isContextExpanded, setIsContextExpanded] = useState(false)
+    const [showKeyPoints, setShowKeyPoints] = useState(false)
+    const [isPageVisible, setIsPageVisible] = useState(true)
+    const [shouldRestartAnimation, setShouldRestartAnimation] = useState(false)
     const timeoutsRef = useRef<NodeJS.Timeout[]>([])
-    const contentRef = useRef<HTMLDivElement>(null)
-    
+    const lastVisibilityChangeRef = useRef<number>(Date.now())
+
     const { ref: inViewRef, inView } = useInView({
         threshold: 0.3,
         triggerOnce: false
     })
 
-    // Pre-calculate all meeting positions
-    const MEETING_HEIGHT = 33 // pixels between each meeting
-
     const meetings = EXAMPLE_MEETINGS.map((meeting, index) => ({
         meeting,
-        translateY: MEETING_HEIGHT * index,
+        translateY: MEETING_HEIGHT * (index - currentMeetingIndex),
         isCurrent: index === currentMeetingIndex,
-        isNext: index === currentMeetingIndex + 1
+        isVisible: index >= currentMeetingIndex - 1 && index <= currentMeetingIndex + 3
     }))
+
+    const clearAllTimeouts = useCallback(() => {
+        timeoutsRef.current.forEach(timeout => clearTimeout(timeout))
+        timeoutsRef.current = []
+    }, [])
+
+    const resetAnimationState = useCallback(() => {
+        setDisplayedContext("")
+        setDisplayedKeyPoints([])
+        setIsContextExpanded(false)
+        setShowKeyPoints(false)
+        clearAllTimeouts()
+    }, [clearAllTimeouts])
+
+    // Handle page visibility changes
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            const isVisible = !document.hidden
+            
+            if (isVisible !== isPageVisible) {
+                setIsPageVisible(isVisible)
+                
+                if (isVisible) {
+                    // Page became visible - check if we should restart animation
+                    const timeSinceHidden = Date.now() - lastVisibilityChangeRef.current
+                    // If hidden for more than 500ms, restart the animation
+                    if (timeSinceHidden > 500) {
+                        setShouldRestartAnimation(true)
+                    }
+                } else {
+                    // Page became hidden - clear timeouts and save timestamp
+                    clearAllTimeouts()
+                    lastVisibilityChangeRef.current = Date.now()
+                }
+            }
+        }
+
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+        
+        // Also handle window focus/blur as fallback
+        const handleFocus = () => {
+            if (!isPageVisible) {
+                setIsPageVisible(true)
+                const timeSinceHidden = Date.now() - lastVisibilityChangeRef.current
+                if (timeSinceHidden > 500) {
+                    setShouldRestartAnimation(true)
+                }
+            }
+        }
+
+        const handleBlur = () => {
+            if (isPageVisible) {
+                setIsPageVisible(false)
+                clearAllTimeouts()
+                lastVisibilityChangeRef.current = Date.now()
+            }
+        }
+
+        window.addEventListener('focus', handleFocus)
+        window.addEventListener('blur', handleBlur)
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange)
+            window.removeEventListener('focus', handleFocus)
+            window.removeEventListener('blur', handleBlur)
+        }
+    }, [isPageVisible, clearAllTimeouts])
 
     const typeText = useCallback((
         text: string,
@@ -212,24 +202,24 @@ export function MeetingBriefVisual({ className }: MeetingBriefVisualProps) {
     ) => {
         let currentIndex = 0
         const typeNextChar = () => {
-            if (currentIndex <= text.length) {
-                setDisplay(text.slice(0, currentIndex))
-                
-                // Schedule scroll check after state update
-                setTimeout(checkAndScroll, 0)
-                
-                if (currentIndex === text.length) {
-                    onComplete?.()
-                    return
-                }
+            // Check if page is still visible before continuing
+            if (!document.hidden && isPageVisible) {
+                if (currentIndex <= text.length) {
+                    setDisplay(text.slice(0, currentIndex))
+                    
+                    if (currentIndex === text.length) {
+                        onComplete?.()
+                        return
+                    }
 
-                const timeout = setTimeout(typeNextChar, speed)
-                timeoutsRef.current.push(timeout)
-                currentIndex++
+                    const timeout = setTimeout(typeNextChar, speed)
+                    timeoutsRef.current.push(timeout)
+                    currentIndex++
+                }
             }
         }
         typeNextChar()
-    }, [])
+    }, [isPageVisible])
 
     const typeKeyPoints = useCallback((
         points: string[],
@@ -239,260 +229,289 @@ export function MeetingBriefVisual({ className }: MeetingBriefVisualProps) {
         let currentCharIndex = 0
         
         const typeNextChar = () => {
-            if (currentPointIndex >= points.length) {
-                onComplete?.()
-                return
-            }
-
-            const currentPoint = points[currentPointIndex]
-            if (currentCharIndex > currentPoint.length) {
-                currentPointIndex++
-                currentCharIndex = 0
-                
-                if (currentPointIndex < points.length) {
-                    const timeout = setTimeout(typeNextChar, ANIMATION_CONSTANTS.TYPING_SPEED.keyPoints)
-                    timeoutsRef.current.push(timeout)
-                } else {
+            // Check if page is still visible before continuing
+            if (!document.hidden && isPageVisible) {
+                if (currentPointIndex >= points.length) {
                     onComplete?.()
+                    return
                 }
-                return
+
+                const currentPoint = points[currentPointIndex]
+                if (currentCharIndex > currentPoint.length) {
+                    currentPointIndex++
+                    currentCharIndex = 0
+                    
+                    if (currentPointIndex < points.length) {
+                        const timeout = setTimeout(typeNextChar, ANIMATION_CONSTANTS.TYPING_SPEED.keyPoints)
+                        timeoutsRef.current.push(timeout)
+                    } else {
+                        onComplete?.()
+                    }
+                    return
+                }
+
+                setDisplayedKeyPoints(prev => {
+                    const newPoints = [...prev]
+                    if (currentPointIndex >= newPoints.length) {
+                        newPoints.push("")
+                    }
+                    newPoints[currentPointIndex] = currentPoint.slice(0, currentCharIndex)
+                    return newPoints
+                })
+
+                currentCharIndex++
+                const timeout = setTimeout(typeNextChar, ANIMATION_CONSTANTS.TYPING_SPEED.keyPoints)
+                timeoutsRef.current.push(timeout)
             }
-
-            setDisplayedKeyPoints(prev => {
-                const newPoints = [...prev]
-                if (currentPointIndex >= newPoints.length) {
-                    newPoints.push("")
-                }
-                newPoints[currentPointIndex] = currentPoint.slice(0, currentCharIndex)
-                return newPoints
-            })
-
-            // Schedule scroll check after state update
-            setTimeout(checkAndScroll, 0)
-
-            currentCharIndex++
-            const timeout = setTimeout(typeNextChar, ANIMATION_CONSTANTS.TYPING_SPEED.keyPoints)
-            timeoutsRef.current.push(timeout)
         }
 
         typeNextChar()
-    }, [])
-
-    // Function to check if we should scroll and do it smoothly
-    const checkAndScroll = useCallback(() => {
-        if (contentRef.current) {
-            const { scrollHeight, clientHeight, scrollTop } = contentRef.current
-            const distanceFromBottom = scrollHeight - (scrollTop + clientHeight)
-            
-            if (distanceFromBottom > 0) {
-                contentRef.current.scrollTo({
-                    top: scrollHeight - clientHeight,
-                    behavior: 'smooth'
-                })
-            }
-        }
-    }, [])
+    }, [isPageVisible])
 
     const startMeetingAnimation = useCallback(() => {
+        // Don't start animation if page is not visible
+        if (!isPageVisible || document.hidden) {
+            return
+        }
+
         const currentMeeting = EXAMPLE_MEETINGS[currentMeetingIndex]
-        setVisibleSources(0)
         setDisplayedKeyPoints([])
         setDisplayedContext("")
+        setIsContextExpanded(true)
+        setShowKeyPoints(false)
         
         typeText(
             currentMeeting.historicContext,
             setDisplayedContext,
             ANIMATION_CONSTANTS.TYPING_SPEED.context,
             () => {
-                typeKeyPoints(currentMeeting.keyPoints, () => {
-                    currentMeeting.sources.forEach((_, index) => {
-                        const timeout = setTimeout(() => {
-                            setVisibleSources(index + 1)
-                        }, ANIMATION_CONSTANTS.SOURCE_REVEAL_DELAY * index)
-                        timeoutsRef.current.push(timeout)
-                    })
+                // Check visibility before scheduling next step
+                if (!isPageVisible || document.hidden) return
 
-                    // Only schedule next meeting if not at the last meeting
-                    if (currentMeetingIndex < EXAMPLE_MEETINGS.length - 1) {
-                        const timeout = setTimeout(() => {
-                            setScrollOffset(prev => prev - MEETING_HEIGHT)
-                            
-                            setTimeout(() => {
-                                setCurrentMeetingIndex(prev => prev + 1)
-                            }, ANIMATION_CONSTANTS.TRANSITION_DURATION)
-                        }, ANIMATION_CONSTANTS.MEETING_DISPLAY_DURATION)
-                        timeoutsRef.current.push(timeout)
-                    }
-                })
+                const collapseTimeout = setTimeout(() => {
+                    if (!isPageVisible || document.hidden) return
+                    setIsContextExpanded(false)
+                    
+                    const keyPointsTimeout = setTimeout(() => {
+                        if (!isPageVisible || document.hidden) return
+                        setShowKeyPoints(true)
+                        
+                        const generateTimeout = setTimeout(() => {
+                            if (!isPageVisible || document.hidden) return
+                            typeKeyPoints(currentMeeting.keyPoints, () => {
+                                if (!isPageVisible || document.hidden) return
+                                if (currentMeetingIndex < EXAMPLE_MEETINGS.length - 1) {
+                                    const timeout = setTimeout(() => {
+                                        if (!isPageVisible || document.hidden) return
+                                        setCurrentMeetingIndex(prev => prev + 1)
+                                    }, ANIMATION_CONSTANTS.MEETING_DISPLAY_DURATION)
+                                    timeoutsRef.current.push(timeout)
+                                }
+                            })
+                        }, 300)
+                        timeoutsRef.current.push(generateTimeout)
+                    }, 700)
+                    timeoutsRef.current.push(keyPointsTimeout)
+                }, 1500)
+                timeoutsRef.current.push(collapseTimeout)
             }
         )
-    }, [currentMeetingIndex])
+    }, [currentMeetingIndex, typeText, typeKeyPoints, isPageVisible])
+
+    const handleContextToggle = useCallback(() => {
+        setIsContextExpanded(!isContextExpanded)
+    }, [isContextExpanded])
+
+    const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault()
+            handleContextToggle()
+        }
+    }, [handleContextToggle])
+
+    // Handle restart animation when page becomes visible again
+    useEffect(() => {
+        if (shouldRestartAnimation && isPageVisible && inView && !document.hidden) {
+            setShouldRestartAnimation(false)
+            resetAnimationState()
+            // Longer delay to ensure smooth transition
+            const restartTimeout = setTimeout(() => {
+                if (isPageVisible && !document.hidden) {
+                    startMeetingAnimation()
+                }
+            }, 200)
+            timeoutsRef.current.push(restartTimeout)
+        }
+    }, [shouldRestartAnimation, isPageVisible, inView, resetAnimationState, startMeetingAnimation])
 
     useEffect(() => {
-        if (inView) {
+        if (inView && isPageVisible && !document.hidden) {
             startMeetingAnimation()
+        } else {
+            clearAllTimeouts()
         }
-    }, [inView, currentMeetingIndex, startMeetingAnimation])
+    }, [inView, currentMeetingIndex, startMeetingAnimation, clearAllTimeouts, isPageVisible])
+
+    useEffect(() => {
+        return () => {
+            clearAllTimeouts()
+        }
+    }, [clearAllTimeouts])
 
     return (
-        <div 
+        <div
             ref={inViewRef}
             className={cn(
-                "relative w-full h-[280px]",
-                "bg-black/40 rounded-lg p-6",
-                "flex flex-col",
-                "overflow-hidden",
+                "relative w-full h-[280px] bg-[#070C0B] rounded-xl overflow-hidden p-4",
                 className
             )}
+            role="region"
+            aria-label="AI Meeting Brief Assistant"
+            aria-live="polite"
+            aria-atomic="true"
         >
-            {/* Timeline - Fixed height section */}
-            <div className="relative h-[66px] mb-4 overflow-hidden"> {/* Reduced height to show only 2 meetings */}
-                {/* Timeline line that connects all meetings */}
-                <div 
-                    className="absolute left-[180px] top-0 bottom-0 transition-transform duration-500 ease-in-out"
-                    style={{ transform: `translateY(${scrollOffset}px)` }}
-                >
-                    <svg
-                        width="2"
-                        height={MEETING_HEIGHT * EXAMPLE_MEETINGS.length}
-                        viewBox={`0 0 2 ${MEETING_HEIGHT * EXAMPLE_MEETINGS.length}`}
-                        preserveAspectRatio="none"
-                        className="w-[2px]"
-                    >
-                        <path
-                            d={`M1 0 L1 ${MEETING_HEIGHT * EXAMPLE_MEETINGS.length}`}
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            className="text-primary/10"
-                            fill="none"
-                            strokeLinecap="round"
-                        />
-                    </svg>
-                </div>
-                
-                {/* Meetings container */}
-                <div 
-                    className="absolute inset-0 transition-transform duration-500 ease-in-out"
-                    style={{ transform: `translateY(${scrollOffset}px)` }}
-                >
-                    {meetings.map(({ meeting, translateY, isCurrent, isNext }) => {
-                        if (!isCurrent && !isNext) return null;
-                        
-                        const endTime = calculateEndTime(meeting.time, meeting.duration)
-                        
-                        return (
-                            <div
-                                key={meeting.id}
-                                className={cn(
-                                    "absolute w-full flex items-center gap-4",
-                                    "transition-all duration-500",
-                                    !isCurrent && "opacity-50"
-                                )}
-                                style={{ transform: `translateY(${translateY}px)` }}
-                            >
-                                <div 
-                                    className={cn(
-                                        "w-[180px] flex items-center gap-2 transition-all duration-500",
-                                        isCurrent
-                                            ? "text-sm font-medium text-primary"
-                                            : "text-xs text-muted-foreground/60"
-                                    )}
-                                >
-                                    <span>{meeting.time}</span>
-                                    <span className="text-primary/30">→</span>
-                                    <span>{endTime}</span>
-                                    <span className="text-xs text-primary/30">({meeting.duration}min)</span>
-                                </div>
-                                <div className="relative flex items-center gap-3 flex-1">
-                                    <div 
-                                        className={cn(
-                                            "rounded-full transition-all duration-500",
-                                            isCurrent
-                                                ? "w-3 h-3 bg-primary animate-pulse"
-                                                : "w-2 h-2 bg-primary/30"
-                                        )}
-                                    />
-                                    <div 
-                                        className={cn(
-                                            "text-sm transition-all duration-500",
-                                            isCurrent
-                                                ? "font-medium text-primary"
-                                                : "text-muted-foreground/60"
-                                        )}
-                                    >
-                                        {meeting.title}
-                                        <span 
-                                            className={cn(
-                                                "text-xs ml-2 transition-all duration-500",
-                                                isCurrent
-                                                    ? "text-primary/70"
-                                                    : "opacity-60"
-                                            )}
-                                        >
-                                            {meeting.isInternal ? "Internal" : meeting.client}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })}
-                </div>
-            </div>
+            <div className="flex gap-4 h-full">
+                {/* Left Side - Meeting Timeline (30%) */}
+                <div className="w-[30%] flex flex-col">
+                    <div className="relative overflow-hidden" style={{ height: `${MEETING_HEIGHT * 4}px` }}>
+                        <div className="absolute left-1.5 top-0 bottom-0 w-0.5 bg-emerald-500/20" />
 
-            {/* Brief content section */}
-            <div className="relative h-[174px]">
-                {/* Sources section */}
-                <div className="absolute bottom-0 left-0 right-6">
-                    <div className="flex items-center gap-2 h-6 mb-1">
-                        <div className="flex -space-x-1">
-                            {EXAMPLE_MEETINGS[currentMeetingIndex].sources.map((source, index) => (
-                                <div
-                                    key={source.id}
-                                    className={cn(
-                                        "w-4 h-4 rounded-sm bg-primary/10 flex items-center justify-center",
-                                        "text-primary/80 transition-all duration-300",
-                                        index < visibleSources
-                                            ? "opacity-100 translate-y-0"
-                                            : "opacity-0 translate-y-2"
-                                    )}
-                                    title={source.name}
-                                >
-                                    {source.icon}
-                                </div>
-                            ))}
+                        <div className="relative">
+                            {meetings.map(({ meeting, translateY, isCurrent, isVisible }) => {
+                                if (!isVisible) return null
+
+                                return (
+                                    <div
+                                        key={meeting.id}
+                                        className={cn(
+                                            "absolute w-full flex items-start gap-3 pb-4",
+                                            "transition-all duration-700 ease-out",
+                                            isCurrent
+                                                ? "opacity-100 scale-100"
+                                                : "opacity-60 scale-98"
+                                        )}
+                                        style={{
+                                            transform: `translateY(${translateY}px)`,
+                                            height: `${MEETING_HEIGHT}px`
+                                        }}
+                                    >
+                                        <div className="relative mt-0 flex justify-center w-3">
+                                            <div
+                                                className={cn(
+                                                    "rounded-full transition-all duration-700",
+                                                    isCurrent
+                                                        ? "w-3 h-3 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]"
+                                                        : "w-2 h-2 bg-emerald-500/50"
+                                                )}
+                                                aria-hidden="true"
+                                            >
+                                                {isCurrent && isPageVisible && (
+                                                    <div className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-50" />
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div className="flex-1 min-w-0">
+                                            <div
+                                                className={cn(
+                                                    "text-sm font-medium truncate mb-2",
+                                                    isCurrent ? "text-emerald-400" : "text-emerald-500/70"
+                                                )}
+                                            >
+                                                {meeting.title}
+                                            </div>
+
+                                            <div
+                                                className={cn(
+                                                    "text-xs font-medium mb-1",
+                                                    isCurrent ? "text-emerald-400/80" : "text-emerald-500/50"
+                                                )}
+                                            >
+                                                {meeting.time} - {meeting.endTime}
+                                            </div>
+
+                                            <div
+                                                className={cn(
+                                                    "text-xs",
+                                                    isCurrent ? "text-emerald-400/60" : "text-emerald-500/40"
+                                                )}
+                                            >
+                                                {meeting.isInternal ? "Internal Meeting" : meeting.client}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )
+                            })}
                         </div>
-                        <span className={cn(
-                            "text-xs text-primary/60 transition-all duration-300",
-                            visibleSources > 0 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
-                        )}>
-                            {visibleSources} sources
-                        </span>
                     </div>
                 </div>
 
-                {/* Content area */}
-                <div className="space-y-4 pr-6">
-                    <p className="text-sm text-muted-foreground/80 min-h-[48px]">
-                        {displayedContext}
-                        {displayedContext && displayedContext !== EXAMPLE_MEETINGS[currentMeetingIndex].historicContext && (
-                            <span className="inline-block w-1 h-4 ml-0.5 bg-primary/50 animate-pulse" />
-                        )}
-                    </p>
-                    <ul className="space-y-2 min-h-[72px]">
-                        {displayedKeyPoints.map((point, index) => (
-                            <li 
-                                key={index}
-                                className="text-xs text-muted-foreground/70 flex items-center gap-2"
+                {/* Right Side - Meeting Details (70%) */}
+                <div className="flex-1 flex flex-col border-l border-emerald-500/10 pl-4">
+                    <div className="space-y-3 flex-1">
+                        {/* Historical Context - Collapsible */}
+                        <div className="bg-emerald-500/5 rounded-lg border border-emerald-500/10 transition-all duration-500">
+                            <div
+                                className="flex items-center gap-2 p-3 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded-lg"
+                                onClick={handleContextToggle}
+                                onKeyDown={handleKeyDown}
+                                role="button"
+                                tabIndex={0}
+                                aria-expanded={isContextExpanded}
+                                aria-controls="historical-context-content"
                             >
-                                <span className="w-1 h-1 rounded-full bg-primary/50 shrink-0" />
-                                <span>{point}</span>
-                                {index === displayedKeyPoints.length - 1 && 
-                                 point !== EXAMPLE_MEETINGS[currentMeetingIndex].keyPoints[index] && (
-                                    <span className="inline-block w-1 h-4 ml-0.5 bg-primary/50 animate-pulse shrink-0" />
-                                )}
-                            </li>
-                        ))}
-                    </ul>
+                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+                                <span className="text-xs font-medium text-emerald-400/80">Historical Context</span>
+                                <div
+                                    className={cn(
+                                        "ml-auto text-emerald-400/60 transition-transform duration-300",
+                                        isContextExpanded ? "rotate-180" : "rotate-0"
+                                    )}
+                                    aria-hidden="true"
+                                >
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="m6 9 6 6 6-6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    </svg>
+                                </div>
+                            </div>
+                            {isContextExpanded && (
+                                <div id="historical-context-content" className="px-3 pb-3">
+                                    <p className="text-sm text-emerald-300/90 leading-relaxed min-h-[50px]">
+                                        {displayedContext}
+                                        {displayedContext && displayedContext !== EXAMPLE_MEETINGS[currentMeetingIndex].historicContext && isPageVisible && (
+                                            <span className="inline-block w-0.5 h-4 ml-1 bg-emerald-400 animate-pulse" aria-hidden="true" />
+                                        )}
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Key Discussion Points */}
+                        {showKeyPoints && (
+                            <div className="bg-emerald-500/5 rounded-lg p-3 border border-emerald-500/10 flex-1 transition-all duration-500">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" aria-hidden="true" />
+                                    <span className="text-xs font-medium text-emerald-400/80">Key Discussion Points</span>
+                                </div>
+                                <ul className="space-y-2 min-h-[80px]" role="list">
+                                    {displayedKeyPoints.map((point, index) => (
+                                        <li
+                                            key={index}
+                                            className="text-sm text-emerald-300/80 flex items-start gap-2 leading-relaxed"
+                                        >
+                                            <span className="w-1 h-1 rounded-full bg-emerald-400/60 shrink-0 mt-2" aria-hidden="true" />
+                                            <span className="flex-1">{point}</span>
+                                            {index === displayedKeyPoints.length - 1 &&
+                                                point !== EXAMPLE_MEETINGS[currentMeetingIndex].keyPoints[index] &&
+                                                isPageVisible && (
+                                                    <span className="inline-block w-0.5 h-4 ml-1 bg-emerald-400 animate-pulse shrink-0" aria-hidden="true" />
+                                                )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
