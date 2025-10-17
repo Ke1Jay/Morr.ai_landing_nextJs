@@ -10,7 +10,7 @@ export default function PricingPage() {
     const [teamCount, setTeamCount] = useState(1);
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
 
-    const plans = [
+    const plans = useMemo(() => [
         {
             name: 'Base',
             description: 'For startups and small teams',
@@ -65,7 +65,7 @@ export default function PricingPage() {
             buttonText: 'Choose Premium',
             buttonVariant: 'outline' as const,
         },
-    ];
+    ], []);
 
     // Calculate price based on team count and billing cycle
     const calculatePrice = (basePrice: number, additionalUserPrice: number, teamCount: number) => {
